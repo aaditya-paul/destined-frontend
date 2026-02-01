@@ -2,7 +2,8 @@ export const MICROCOPY = {
   splash: {
     title: "Fewer profiles. Better conversations.",
     subtitle: "Dating, without the noise.",
-    cta: "Start Properly",
+    // cta: "Start Properly",
+    cta: "Shoot your shot",
   },
 
   auth: {

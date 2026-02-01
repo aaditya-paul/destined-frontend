@@ -7,7 +7,7 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 
-const CTA_BTN = ({ text }: { text: string }) => {
+const CTA_BTN = ({ text, onPress }: { text: string; onPress?: () => void }) => {
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -19,6 +19,7 @@ const CTA_BTN = ({ text }: { text: string }) => {
   return (
     <View style={{ width: "100%", alignItems: "center" }}>
       <Pressable
+        onPress={onPress}
         onPressIn={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           scale.value = withSpring(0.96, {
