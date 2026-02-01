@@ -8,10 +8,22 @@
     "scheme": "destinedfrontend",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "fonts": [
+        {
+          "fontFamily": "ZonaPro-Bold",
+          "fontDefinitions": [
+            {
+              "path": "./assets/fonts/ZonaPro-Bold.otf",
+              "weight": "700"
+            }
+          ]
+        }
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -37,6 +49,12 @@
           "dark": {
             "backgroundColor": "#000000"
           }
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": ["./assets/fonts/ZonaPro-Bold.otf"]
         }
       ]
     ],

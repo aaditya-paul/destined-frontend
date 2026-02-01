@@ -1,98 +1,200 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View, Image, Pressable } from "react-native";
+import React, { useEffect } from "react";
+import { MICROCOPY } from "@/constants/microcopies";
+import CTA_BTN from "@/components/ui/Cta_btn";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withDelay,
+} from "react-native-reanimated";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const index = () => {
+  const topStripe1 = useSharedValue(200);
+  const topStripe2 = useSharedValue(200);
+  const topStripe3 = useSharedValue(200);
+  const bottomStripe1 = useSharedValue(200);
+  const bottomStripe2 = useSharedValue(200);
+  const bottomStripe3 = useSharedValue(200);
 
-export default function HomeScreen() {
+  useEffect(() => {
+    // Animate top stripes one by one
+    topStripe1.value = withDelay(
+      100,
+      withSpring(0, { damping: 20, stiffness: 90 }),
+    );
+    topStripe2.value = withDelay(
+      250,
+      withSpring(0, { damping: 20, stiffness: 90 }),
+    );
+    topStripe3.value = withDelay(
+      400,
+      withSpring(0, { damping: 20, stiffness: 90 }),
+    );
+
+    // Animate bottom stripes one by one
+    bottomStripe1.value = withDelay(
+      100,
+      withSpring(0, { damping: 20, stiffness: 90 }),
+    );
+    bottomStripe2.value = withDelay(
+      250,
+      withSpring(0, { damping: 20, stiffness: 90 }),
+    );
+    bottomStripe3.value = withDelay(
+      400,
+      withSpring(0, { damping: 20, stiffness: 90 }),
+    );
+  }, []);
+
+  const topStripe1Style = useAnimatedStyle(() => ({
+    transform: [{ rotate: "35deg" }, { translateX: topStripe1.value }],
+  }));
+
+  const topStripe2Style = useAnimatedStyle(() => ({
+    transform: [{ rotate: "35deg" }, { translateX: topStripe2.value }],
+  }));
+
+  const topStripe3Style = useAnimatedStyle(() => ({
+    transform: [{ rotate: "35deg" }, { translateX: topStripe3.value }],
+  }));
+
+  const bottomStripe1Style = useAnimatedStyle(() => ({
+    transform: [{ rotate: "35deg" }, { translateX: bottomStripe1.value }],
+  }));
+
+  const bottomStripe2Style = useAnimatedStyle(() => ({
+    transform: [{ rotate: "35deg" }, { translateX: bottomStripe2.value }],
+  }));
+
+  const bottomStripe3Style = useAnimatedStyle(() => ({
+    transform: [{ rotate: "35deg" }, { translateX: bottomStripe3.value }],
+  }));
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
+    <View style={styles.container}>
+      {/* stripes */}
+      <View style={styles.stripe_top_container}>
+        <Animated.View
+          style={[styles.stripe_one, topStripe1Style]}
+        ></Animated.View>
+        <Animated.View
+          style={[styles.stripe_two, topStripe2Style]}
+        ></Animated.View>
+        <Animated.View
+          style={[styles.stripe_three, topStripe3Style]}
+        ></Animated.View>
+      </View>
+      <View style={styles.stripe_bottom_container}>
+        <Animated.View
+          style={[styles.stripe_one, bottomStripe1Style]}
+        ></Animated.View>
+        <Animated.View
+          style={[styles.stripe_two, bottomStripe2Style]}
+        ></Animated.View>
+        <Animated.View
+          style={[styles.stripe_three, bottomStripe3Style]}
+        ></Animated.View>
+      </View>
+      {/* logo and branding */}
+      <View style={styles.branding}>
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+          style={styles.logo}
+          source={require("@/assets/destined_logo_undecided.png")}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <View style={{ alignItems: "center" }}>
+          <Text style={[styles.title, { fontSize: 36 }]}>Destined </Text>
+          <Text
+            style={[
+              styles.title,
+              { fontSize: 16, marginTop: 5, opacity: 0.8, color: "#8A8A8A" },
+            ]}
+          >
+            the dating app
+          </Text>
+        </View>
+      </View>
+      {/* cta */}
+      <View style={{ width: "100%", position: "absolute", bottom: 50 }}>
+        <CTA_BTN text={MICROCOPY.splash.cta} />
+      </View>
+    </View>
   );
-}
+};
+
+export default index;
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  // stripes: {
+  //   position: "absolute",
+  //   top: 0,
+  //   left: 0,
+  //   width: "100%",
+  //   height: "30%",
+  //   backgroundColor: "#FF6347",
+  //   borderBottomLeftRadius: 170,
+  //   borderBottomRightRadius: 170,
+  // },
+  stripe_top_container: {
+    position: "absolute",
+    top: 0,
+    right: 0,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
+  stripe_bottom_container: {
+    position: "absolute",
     bottom: 0,
     left: 0,
-    position: 'absolute',
+    transform: [{ rotate: "180deg" }],
+  },
+  stripe_one: {
+    position: "absolute",
+    top: -100,
+    right: 0,
+    width: 20,
+    height: 200,
+    backgroundColor: "#ff6347c4",
+    borderRadius: 20,
+  },
+  stripe_two: {
+    position: "absolute",
+    top: -50,
+    right: 10,
+    width: 20,
+    height: 250,
+    backgroundColor: "#ff6347c4",
+    borderRadius: 20,
+  },
+  stripe_three: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    width: 20,
+    height: 200,
+    backgroundColor: "#ff6347c4",
+    borderRadius: 20,
+  },
+  container: {
+    backgroundColor: "#F5EFE6",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logo: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    // fontWeight: "bold",
+    fontFamily: "ZonaPro-Bold",
+    // color: "#ff4365",
+    // color: "#FF6347",
+    color: "#1E3A5F",
+  },
+  branding: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 70,
   },
 });
