@@ -1,6 +1,5 @@
 import CTA_BTN from "@/components/ui/Cta_btn";
 import DatePicker from "@/components/ui/DatePicker";
-import DecorativeStripes from "@/components/ui/DecorativeStripes";
 import Dropdown from "@/components/ui/Dropdown";
 import ProgressBar from "@/components/ui/ProgressBar";
 import TextInput from "@/components/ui/TextInput";
@@ -37,27 +36,14 @@ const BasicIdentityScreen = () => {
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "First name is required";
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "Last name is required";
-    }
+    if (!formData.firstName.trim()) newErrors.firstName = "FIRST NAME REQUIRED";
+    if (!formData.lastName.trim()) newErrors.lastName = "LAST NAME REQUIRED";
 
     const age = new Date().getFullYear() - formData.dateOfBirth.getFullYear();
-    if (age < 18) {
-      newErrors.dateOfBirth = "You must be at least 18 years old";
-    }
+    if (age < 18) newErrors.dateOfBirth = "MINIMUM AGE IS 18";
 
-    if (!formData.gender) {
-      newErrors.gender = "Please select your gender";
-    }
-
-    if (!formData.lookingFor) {
-      newErrors.lookingFor = "Please select who you're looking for";
-    }
+    if (!formData.gender) newErrors.gender = "SELECT YOUR GENDER";
+    if (!formData.lookingFor) newErrors.lookingFor = "SELECT PREFERENCE";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -65,18 +51,23 @@ const BasicIdentityScreen = () => {
 
   const handleContinue = () => {
     if (validateForm()) {
-      // TODO: Save data to state management or backend
-      console.log("Form data:", formData);
       router.push("/onboarding/bio-interests");
     }
   };
 
   return (
     <View style={styles.container}>
-      <DecorativeStripes position="top" />
-      <DecorativeStripes position="bottom" />
+      {/* <DecorativeStripes position="top" /> */}
 
-      <ProgressBar totalSteps={3} currentStep={1} />
+      <View style={styles.topNav}>
+        <ProgressBar totalSteps={3} currentStep={1} />
+        <View style={styles.header}>
+          <Text style={styles.title}>The Foundation</Text>
+          <Text style={styles.subtitle}>
+            Enter your core details to initialize your profile.
+          </Text>
+        </View>
+      </View>
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -86,118 +77,163 @@ const BasicIdentityScreen = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
-            <Text style={styles.title}>Let&apos;s get to know you</Text>
-            <Text style={styles.subtitle}>
-              Tell us about yourself to create your profile
-            </Text>
+          {/* Identification Block */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>IDENTIFICATION</Text>
+            <View style={styles.formGroup}>
+              <TextInput
+                label="FIRST NAME"
+                placeholder="John"
+                value={formData.firstName}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, firstName: text })
+                }
+                error={errors.firstName}
+                autoCapitalize="words"
+                // labelStyle={styles.inputLabel}
+              />
+              <TextInput
+                label="LAST NAME"
+                placeholder="Doe"
+                value={formData.lastName}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, lastName: text })
+                }
+                error={errors.lastName}
+                autoCapitalize="words"
+                // labelStyle={styles.inputLabel}
+              />
+            </View>
           </View>
 
-          <View style={styles.form}>
-            <TextInput
-              label="First Name"
-              placeholder="Enter your first name"
-              value={formData.firstName}
-              keyboardType="name-phone-pad"
-              autoComplete="name-given"
-              onChangeText={(text) =>
-                setFormData({ ...formData, firstName: text })
-              }
-              error={errors.firstName}
-              autoCapitalize="words"
-            />
+          {/* Vital Stats Block */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>VITAL STATS</Text>
+            <View style={styles.formGroup}>
+              <DatePicker
+                label="DATE OF BIRTH"
+                value={formData.dateOfBirth}
+                onChange={(date) =>
+                  setFormData({ ...formData, dateOfBirth: date })
+                }
+                error={errors.dateOfBirth}
+              />
 
-            <TextInput
-              label="Last Name"
-              keyboardType="name-phone-pad"
-              autoComplete="name-family"
-              placeholder="Enter your last name"
-              value={formData.lastName}
-              onChangeText={(text) =>
-                setFormData({ ...formData, lastName: text })
-              }
-              error={errors.lastName}
-              autoCapitalize="words"
-            />
+              <View style={styles.dropdownRow}>
+                <View style={{ flex: 1 }}>
+                  <Dropdown
+                    label="YOUR GENDER"
+                    value={formData.gender}
+                    options={genderOptions}
+                    onChange={(value) =>
+                      setFormData({ ...formData, gender: value })
+                    }
+                    placeholder="Select"
+                    error={errors.gender}
+                  />
+                </View>
+              </View>
 
-            <DatePicker
-              label="Date of Birth"
-              value={formData.dateOfBirth}
-              onChange={(date) =>
-                setFormData({ ...formData, dateOfBirth: date })
-              }
-              error={errors.dateOfBirth}
-            />
-
-            <Dropdown
-              label="Gender"
-              value={formData.gender}
-              options={genderOptions}
-              onChange={(value) => setFormData({ ...formData, gender: value })}
-              placeholder="Select your gender"
-              error={errors.gender}
-            />
-
-            <Dropdown
-              label="I'm looking for"
-              value={formData.lookingFor}
-              options={lookingForOptions}
-              onChange={(value) =>
-                setFormData({ ...formData, lookingFor: value })
-              }
-              placeholder="Select preference"
-              error={errors.lookingFor}
-            />
+              <Dropdown
+                label="INTERESTED IN"
+                value={formData.lookingFor}
+                options={lookingForOptions}
+                onChange={(value) =>
+                  setFormData({ ...formData, lookingFor: value })
+                }
+                placeholder="Select preference"
+                error={errors.lookingFor}
+              />
+            </View>
           </View>
 
           <View style={styles.buttonContainer}>
             <CTA_BTN
-              text="Continue"
+              text="INITIALIZE PROFILE"
               onPress={handleContinue}
               btnColor={colors.primary}
             />
+            <Text style={styles.infoText}>
+              You must be at least 18 to join this community.
+            </Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* <DecorativeStripes position="bottom" /> */}
     </View>
   );
 };
-
-export default BasicIdentityScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: spacing.lg,
+  },
+  topNav: {
+    paddingTop: spacing.xl,
+    paddingHorizontal: spacing["2xl"],
+  },
+  header: {
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: fontFamilies.bold,
+    color: colors.secondary,
+    letterSpacing: -0.5,
+    textTransform: "uppercase",
+  },
+  subtitle: {
+    fontSize: fontSizes.sm,
+    color: colors.textSecondary,
+    opacity: 0.8,
   },
   keyboardView: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: spacing["2xl"],
-    paddingBottom: spacing["3xl"],
+    paddingBottom: 120,
+    paddingTop: spacing.xl,
   },
-  header: {
-    alignItems: "center",
-    marginBottom: spacing["3xl"],
+  section: {
+    marginBottom: spacing["2xl"],
   },
-  title: {
-    fontSize: fontSizes.xl,
+  sectionLabel: {
+    fontSize: 10,
+    fontFamily: fontFamilies.bold,
+    color: colors.textSecondary,
+    letterSpacing: 2.5,
+    marginBottom: spacing.lg,
+    opacity: 0.6,
+  },
+  formGroup: {
+    gap: spacing.xs,
+  },
+  inputLabel: {
+    fontSize: 12,
     fontFamily: fontFamilies.bold,
     color: colors.secondary,
-    marginBottom: spacing.sm,
-    textAlign: "center",
+    letterSpacing: 1,
   },
-  subtitle: {
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    textAlign: "center",
-  },
-  form: {
-    width: "100%",
+  dropdownRow: {
+    flexDirection: "row",
+    gap: spacing.md,
   },
   buttonContainer: {
     marginTop: spacing.xl,
+    gap: spacing.md,
+  },
+  infoText: {
+    textAlign: "center",
+    fontSize: 10,
+    color: colors.textSecondary,
+    fontFamily: fontFamilies.bold,
+    letterSpacing: 0.5,
+    opacity: 0.7,
   },
 });
+
+export default BasicIdentityScreen;

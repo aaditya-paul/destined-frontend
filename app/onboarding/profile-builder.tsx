@@ -10,18 +10,24 @@ import {
 } from "@/constants/globalStyles";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+const { width } = Dimensions.get("window");
+const GRID_SPACING = spacing.md;
+const COLUMN_WIDTH = (width - spacing["2xl"] * 2 - GRID_SPACING * 2) / 3;
 
 const ProfileBuilderScreen = () => {
   const router = useRouter();
-  const [images, setImages] = useState<(string | undefined)[]>([
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-  ]);
+  const [images, setImages] = useState<(string | undefined)[]>(
+    new Array(6).fill(undefined),
+  );
   const [error, setError] = useState("");
 
   const handleImageSelect = (uri: string, index: number) => {
@@ -34,7 +40,7 @@ const ProfileBuilderScreen = () => {
   const validateForm = () => {
     const uploadedImages = images.filter((img) => img !== undefined);
     if (uploadedImages.length < 2) {
-      setError("Please upload at least 2 photos");
+      setError("Add at least 2 photos to stand out.");
       return false;
     }
     return true;
@@ -42,25 +48,16 @@ const ProfileBuilderScreen = () => {
 
   const handleComplete = () => {
     if (validateForm()) {
-      Alert.alert(
-        "Profile Complete!",
-        "Your profile has been created successfully.",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              // TODO: Save data and navigate to main app
-              console.log("Profile images:", images);
-              router.replace("/");
-            },
+      Alert.alert("Profile Locked", "Your journey begins now.", [
+        {
+          text: "Enter App",
+          onPress: () => {
+            console.log("Profile images:", images);
+            router.replace("/");
           },
-        ],
-      );
+        },
+      ]);
     }
-  };
-
-  const handleBack = () => {
-    router.back();
   };
 
   const uploadedCount = images.filter((img) => img !== undefined).length;
@@ -68,157 +65,194 @@ const ProfileBuilderScreen = () => {
   return (
     <View style={styles.container}>
       <DecorativeStripes position="top" />
-      <DecorativeStripes position="bottom" />
 
-      <ProgressBar totalSteps={3} currentStep={3} />
+      <View style={styles.topNav}>
+        <ProgressBar totalSteps={3} currentStep={3} />
+        <View style={styles.header}>
+          <Text style={styles.title}>Visual Identity</Text>
+          <Text style={styles.subtitle}>
+            Select 2-6 photos to define your presence.
+          </Text>
+        </View>
+      </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Show your best self</Text>
-          <Text style={styles.subtitle}>
-            Upload 2-6 photos that represent you
-          </Text>
-          <Text style={styles.photoCount}>
-            {uploadedCount}/6 photos uploaded
-          </Text>
-        </View>
-
-        {error && <Text style={styles.errorText}>{error}</Text>}
-
-        <View style={styles.photosGrid}>
-          {/* Main photo - larger */}
-          <View style={styles.mainPhotoContainer}>
+        <View style={styles.gridContainer}>
+          {/* Main Large Photo */}
+          <View style={styles.mainSlot}>
             <ImageUpload
               imageUri={images[0]}
               onImageSelect={(uri) => handleImageSelect(uri, 0)}
-              size={160}
-              label="Main Photo"
+              size={COLUMN_WIDTH * 2 + GRID_SPACING}
+              label="Primary"
             />
           </View>
 
-          {/* Secondary photos - smaller grid */}
-          <View style={styles.secondaryPhotosContainer}>
-            {[1, 2, 3, 4, 5].map((index) => (
+          {/* Secondary Slots */}
+          <View style={styles.sideColumn}>
+            {[1, 2].map((i) => (
               <ImageUpload
-                key={index}
-                imageUri={images[index]}
-                onImageSelect={(uri) => handleImageSelect(uri, index)}
-                size={100}
+                key={i}
+                imageUri={images[i]}
+                onImageSelect={(uri) => handleImageSelect(uri, i)}
+                size={COLUMN_WIDTH}
+              />
+            ))}
+          </View>
+
+          {/* Bottom Row */}
+          <View style={styles.bottomRow}>
+            {[3, 4, 5].map((i) => (
+              <ImageUpload
+                key={i}
+                imageUri={images[i]}
+                onImageSelect={(uri) => handleImageSelect(uri, i)}
+                size={COLUMN_WIDTH}
               />
             ))}
           </View>
         </View>
 
-        <View style={styles.tips}>
-          <Text style={styles.tipsTitle}>Photo Tips:</Text>
-          <Text style={styles.tipText}>• Show your face clearly</Text>
-          <Text style={styles.tipText}>
-            • Include variety (close-ups, full body)
-          </Text>
-          <Text style={styles.tipText}>• Use recent photos</Text>
-          <Text style={styles.tipText}>• Show your hobbies and interests</Text>
-          <Text style={styles.tipText}>• Smile naturally!</Text>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+        <View style={styles.statusRow}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{uploadedCount}/6 SLOTS FILLED</Text>
+          </View>
+        </View>
+
+        <View style={styles.guideContainer}>
+          <Text style={styles.guideTitle}>THE BLUEPRINT</Text>
+          <View style={styles.guideGrid}>
+            <Text style={styles.guideItem}>• High Clarity</Text>
+            <Text style={styles.guideItem}>• Solo Shots</Text>
+            <Text style={styles.guideItem}>• Natural Light</Text>
+            <Text style={styles.guideItem}>• Recent</Text>
+          </View>
         </View>
 
         <View style={styles.buttonContainer}>
           <CTA_BTN
-            text="Complete Profile"
+            text="FINALIZE PROFILE"
             onPress={handleComplete}
             btnColor={colors.primary}
           />
-          <CTA_BTN
-            text="Back"
-            onPress={handleBack}
-            btnColor={colors.white}
-            txtColor={colors.secondary}
-            style={styles.backButton}
-          />
+          <Text style={styles.backLink} onPress={() => router.back()}>
+            GO BACK
+          </Text>
         </View>
       </ScrollView>
+
+      {/* <DecorativeStripes position="bottom" /> */}
     </View>
   );
 };
-
-export default ProfileBuilderScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: spacing.lg,
   },
-  scrollContent: {
+  topNav: {
+    paddingTop: spacing.xl,
     paddingHorizontal: spacing["2xl"],
-    paddingBottom: spacing["3xl"],
   },
   header: {
-    alignItems: "center",
-    marginBottom: spacing["3xl"],
+    marginTop: spacing.lg,
+    marginBottom: spacing.md,
   },
   title: {
-    fontSize: fontSizes.xl,
+    fontSize: 28,
     fontFamily: fontFamilies.bold,
     color: colors.secondary,
-    marginBottom: spacing.sm,
-    textAlign: "center",
+    letterSpacing: -0.5,
+    textTransform: "uppercase",
   },
   subtitle: {
     fontSize: fontSizes.sm,
     color: colors.textSecondary,
-    textAlign: "center",
-    marginBottom: spacing.md,
+    opacity: 0.8,
   },
-  photoCount: {
-    fontSize: fontSizes.sm,
-    color: colors.primary,
-    fontWeight: "600",
+  scrollContent: {
+    paddingHorizontal: spacing["2xl"],
+    paddingBottom: 100,
   },
-  errorText: {
-    fontSize: fontSizes.sm,
-    color: colors.primary,
-    textAlign: "center",
-    marginBottom: spacing.lg,
-    fontWeight: "600",
-  },
-  photosGrid: {
-    alignItems: "center",
-    marginBottom: spacing["3xl"],
-  },
-  mainPhotoContainer: {
-    marginBottom: spacing.xl,
-  },
-  secondaryPhotosContainer: {
+  gridContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "center",
+    gap: GRID_SPACING,
+    marginTop: spacing.md,
+  },
+  mainSlot: {
+    width: COLUMN_WIDTH * 2 + GRID_SPACING,
+    height: COLUMN_WIDTH * 2 + GRID_SPACING,
+  },
+  sideColumn: {
+    gap: GRID_SPACING,
+  },
+  bottomRow: {
+    flexDirection: "row",
+    gap: GRID_SPACING,
+    marginTop: 0,
+  },
+  statusRow: {
+    alignItems: "center",
+    marginVertical: spacing.xl,
+  },
+  badge: {
+    backgroundColor: colors.secondary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  badgeText: {
+    color: colors.white,
+    fontSize: 10,
+    fontFamily: fontFamilies.bold,
+    letterSpacing: 1,
+  },
+  guideContainer: {
+    borderTopWidth: 1,
+    borderColor: "#EEEEEE",
+    paddingTop: spacing.lg,
+    marginBottom: spacing["2xl"],
+  },
+  guideTitle: {
+    fontSize: 12,
+    fontFamily: fontFamilies.bold,
+    color: colors.textSecondary,
+    letterSpacing: 2,
+    marginBottom: spacing.sm,
+  },
+  guideGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: spacing.md,
   },
-  tips: {
-    backgroundColor: colors.white,
-    padding: spacing.xl,
-    borderRadius: 20,
-    marginBottom: spacing["3xl"],
-  },
-  tipsTitle: {
-    fontSize: fontSizes.base,
-    fontFamily: fontFamilies.bold,
-    color: colors.secondary,
-    marginBottom: spacing.md,
-  },
-  tipText: {
-    fontSize: fontSizes.sm,
+  guideItem: {
+    fontSize: 13,
     color: colors.textSecondary,
-    marginBottom: spacing.xs,
-    lineHeight: 22,
+    width: "45%",
+  },
+  errorText: {
+    color: colors.primary,
+    textAlign: "center",
+    fontFamily: fontFamilies.bold,
+    marginTop: spacing.md,
   },
   buttonContainer: {
-    gap: spacing.md,
+    gap: spacing.lg,
   },
-  backButton: {
-    borderWidth: 2,
-    borderColor: colors.secondary,
+  backLink: {
+    textAlign: "center",
+    fontSize: 12,
+    color: colors.textSecondary,
+    letterSpacing: 1,
+    textDecorationLine: "underline",
   },
 });
+
+export default ProfileBuilderScreen;

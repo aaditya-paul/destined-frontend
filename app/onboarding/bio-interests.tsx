@@ -1,10 +1,8 @@
 import CTA_BTN from "@/components/ui/Cta_btn";
-import DecorativeStripes from "@/components/ui/DecorativeStripes";
 import InterestChip from "@/components/ui/InterestChip";
 import ProgressBar from "@/components/ui/ProgressBar";
 import TextInput from "@/components/ui/TextInput";
 import {
-  borderRadius,
   colors,
   fontFamilies,
   fontSizes,
@@ -60,40 +58,35 @@ const BioInterestsScreen = () => {
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-
-    if (!bio.trim()) {
-      newErrors.bio = "Please write something about yourself";
-    } else if (bio.trim().length < 20) {
-      newErrors.bio = "Bio should be at least 20 characters";
+    if (!bio.trim() || bio.trim().length < 20) {
+      newErrors.bio = "YOUR STORY NEEDS MORE DETAIL (MIN 20 CHARS).";
     }
-
     if (selectedInterests.length < 3) {
-      newErrors.interests = "Please select at least 3 interests";
+      newErrors.interests = "SELECT AT LEAST 3 ATTRIBUTES.";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleContinue = () => {
     if (validateForm()) {
-      // TODO: Save data to state management or backend
-      console.log("Bio:", bio);
-      console.log("Interests:", selectedInterests);
       router.push("/onboarding/profile-builder");
     }
   };
 
-  const handleBack = () => {
-    router.back();
-  };
-
   return (
     <View style={styles.container}>
-      <DecorativeStripes position="top" />
-      <DecorativeStripes position="bottom" />
+      {/* <DecorativeStripes position="top" /> */}
 
-      <ProgressBar totalSteps={3} currentStep={2} />
+      <View style={styles.topNav}>
+        <ProgressBar totalSteps={3} currentStep={2} />
+        <View style={styles.header}>
+          <Text style={styles.title}>The Narrative</Text>
+          <Text style={styles.subtitle}>
+            Define your character and what drives you.
+          </Text>
+        </View>
+      </View>
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -103,17 +96,21 @@ const BioInterestsScreen = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
-            <Text style={styles.title}>Tell your story</Text>
-            <Text style={styles.subtitle}>
-              Share what makes you unique and what you love
-            </Text>
-          </View>
-
+          {/* Bio Section */}
           <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.label}>PERSONAL STATEMENT</Text>
+              <Text
+                style={[
+                  styles.charCount,
+                  bio.length > 450 && { color: colors.primary },
+                ]}
+              >
+                {bio.length}/500
+              </Text>
+            </View>
             <TextInput
-              label="About Me"
-              placeholder="Write a few lines about yourself..."
+              placeholder="What makes you... you?"
               value={bio}
               onChangeText={setBio}
               error={errors.bio}
@@ -122,17 +119,25 @@ const BioInterestsScreen = () => {
               style={styles.bioInput}
               maxLength={500}
             />
-            <Text style={styles.charCount}>{bio.length}/500</Text>
           </View>
 
+          {/* Interests Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>My Interests</Text>
-            <Text style={styles.sectionSubtitle}>
-              Select 3-10 interests ({selectedInterests.length} selected)
-            </Text>
-            {errors.interests && (
+            <View style={styles.sectionHeader}>
+              <Text style={styles.label}>ATTRIBUTES & INTERESTS</Text>
+              <Text style={styles.selectionCount}>
+                {selectedInterests.length}/10
+              </Text>
+            </View>
+
+            {errors.interests ? (
               <Text style={styles.errorText}>{errors.interests}</Text>
+            ) : (
+              <Text style={styles.sectionSubtitle}>
+                Select 3-10 tags that resonate with you.
+              </Text>
             )}
+
             <View style={styles.interestsContainer}>
               {availableInterests.map((interest) => (
                 <InterestChip
@@ -147,98 +152,119 @@ const BioInterestsScreen = () => {
 
           <View style={styles.buttonContainer}>
             <CTA_BTN
-              text="Continue"
+              text="SAVE & CONTINUE"
               onPress={handleContinue}
               btnColor={colors.primary}
             />
-            <CTA_BTN
-              text="Back"
-              onPress={handleBack}
-              btnColor={colors.white}
-              txtColor={colors.secondary}
-              style={styles.backButton}
-            />
+            <Text style={styles.backLink} onPress={() => router.back()}>
+              GO BACK
+            </Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      {/* <DecorativeStripes position="bottom" /> */}
     </View>
   );
 };
-
-export default BioInterestsScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: spacing.lg,
+  },
+  topNav: {
+    paddingTop: spacing.xl,
+    paddingHorizontal: spacing["2xl"],
+  },
+  header: {
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: fontFamilies.bold,
+    color: colors.secondary,
+    letterSpacing: -0.5,
+    textTransform: "uppercase",
+  },
+  subtitle: {
+    fontSize: fontSizes.sm,
+    color: colors.textSecondary,
+    opacity: 0.8,
   },
   keyboardView: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: spacing["2xl"],
-    paddingBottom: spacing["3xl"],
-  },
-  header: {
-    alignItems: "center",
-    marginBottom: spacing["3xl"],
-  },
-  title: {
-    fontSize: fontSizes.xl,
-    fontFamily: fontFamilies.bold,
-    color: colors.secondary,
-    marginBottom: spacing.sm,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    textAlign: "center",
+    paddingBottom: 120,
+    paddingTop: spacing.xl,
   },
   section: {
     marginBottom: spacing["3xl"],
   },
-  sectionTitle: {
-    fontSize: fontSizes.lg,
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing.md,
+  },
+  label: {
+    fontSize: 12,
     fontFamily: fontFamilies.bold,
     color: colors.secondary,
-    marginBottom: spacing.sm,
-  },
-  sectionSubtitle: {
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    marginBottom: spacing.lg,
+    letterSpacing: 1.5,
   },
   bioInput: {
-    height: 120,
+    minHeight: 140,
     textAlignVertical: "top",
-    borderWidth: 1,
+    backgroundColor: colors.white,
+    borderWidth: 1.5,
     borderColor: colors.secondary,
-    borderRadius: borderRadius.sm,
-    padding: spacing.sm,
+    borderRadius: 12,
+    padding: spacing.md,
+    fontSize: 15,
+    lineHeight: 22,
   },
   charCount: {
-    fontSize: fontSizes.xs,
+    fontSize: 10,
+    fontFamily: fontFamilies.bold,
     color: colors.textSecondary,
-    textAlign: "right",
-    marginTop: spacing.xs,
+  },
+  sectionSubtitle: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: spacing.md,
+    fontStyle: "italic",
+  },
+  selectionCount: {
+    fontSize: 10,
+    fontFamily: fontFamilies.bold,
+    color: colors.primary,
   },
   interestsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
+    gap: spacing.sm,
   },
   errorText: {
-    fontSize: fontSizes.xs,
+    fontSize: 11,
     color: colors.primary,
-    marginBottom: spacing.sm,
+    fontFamily: fontFamilies.bold,
+    marginBottom: spacing.md,
+    textTransform: "uppercase",
   },
   buttonContainer: {
-    marginTop: spacing.xl,
-    gap: spacing.md,
+    marginTop: spacing.lg,
+    gap: spacing.lg,
   },
-  backButton: {
-    borderWidth: 2,
-    borderColor: colors.secondary,
+  backLink: {
+    textAlign: "center",
+    fontSize: 12,
+    color: colors.textSecondary,
+    letterSpacing: 1,
+    textDecorationLine: "underline",
   },
 });
+
+export default BioInterestsScreen;
