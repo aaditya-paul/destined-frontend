@@ -5,7 +5,6 @@ import Animated, {
   useSharedValue,
   withDelay,
   withSpring,
-  runOnJS,
 } from "react-native-reanimated";
 
 interface DecorativeStripesProps {
@@ -20,7 +19,7 @@ const DecorativeStripes: React.FC<DecorativeStripesProps> = ({ position }) => {
 
   React.useEffect(() => {
     setMounted(true);
-    
+
     // Use requestAnimationFrame to ensure animations start after mount
     requestAnimationFrame(() => {
       stripe1.value = withDelay(
@@ -38,33 +37,33 @@ const DecorativeStripes: React.FC<DecorativeStripesProps> = ({ position }) => {
     });
   }, []);
 
-    const stripe1Style = useAnimatedStyle(() => ({
-      transform: [{ rotate: "35deg" }, { translateX: stripe1.value }],
-    }));
+  const stripe1Style = useAnimatedStyle(() => ({
+    transform: [{ rotate: "35deg" }, { translateX: stripe1.value }],
+  }));
 
-    const stripe2Style = useAnimatedStyle(() => ({
-      transform: [{ rotate: "35deg" }, { translateX: stripe2.value }],
-    }));
+  const stripe2Style = useAnimatedStyle(() => ({
+    transform: [{ rotate: "35deg" }, { translateX: stripe2.value }],
+  }));
 
-    const stripe3Style = useAnimatedStyle(() => ({
-      transform: [{ rotate: "35deg" }, { translateX: stripe3.value }],
-    }));
+  const stripe3Style = useAnimatedStyle(() => ({
+    transform: [{ rotate: "35deg" }, { translateX: stripe3.value }],
+  }));
 
-    const containerStyle =
-      position === "top"
-        ? styles.stripeTopContainer
-        : styles.stripeBottomContainer;
+  const containerStyle =
+    position === "top"
+      ? styles.stripeTopContainer
+      : styles.stripeBottomContainer;
 
-    if (!mounted) return null;
+  if (!mounted) return null;
 
-    return (
-      <View style={containerStyle}>
-        <Animated.View style={[styles.stripeOne, stripe1Style]} />
-        <Animated.View style={[styles.stripeTwo, stripe2Style]} />
-        <Animated.View style={[styles.stripeThree, stripe3Style]} />
-      </View>
-    );
-  };
+  return (
+    <View style={containerStyle}>
+      <Animated.View style={[styles.stripeOne, stripe1Style]} />
+      <Animated.View style={[styles.stripeTwo, stripe2Style]} />
+      <Animated.View style={[styles.stripeThree, stripe3Style]} />
+    </View>
+  );
+};
 
 export default DecorativeStripes;
 

@@ -1,24 +1,45 @@
-import { View, Text, Image, StyleSheet } from 'react-native';
-import React from 'react';
+import {
+  buttonDimensions,
+  colors,
+  fontFamilies,
+  fontSizes,
+  opacity,
+  spacing,
+} from "@/constants/globalStyles";
+import React from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 interface LogoBrandingProps {
   showTagline?: boolean;
+  showOnlyLogo?: boolean;
 }
 
-const LogoBranding: React.FC<LogoBrandingProps> = ({ showTagline = true }) => {
+const LogoBranding = ({
+  showTagline = true,
+  showOnlyLogo = false,
+}: LogoBrandingProps) => {
   return (
     <View style={styles.branding}>
       <Image
         style={styles.logo}
-        source={require('@/assets/destined_logo_undecided.png')}
+        source={require("@/assets/images/destined_small_logo.png")}
       />
-      <View style={{ alignItems: 'center' }}>
-        <Text style={[styles.title, { fontSize: 36 }]}>Destined</Text>
-        {showTagline && (
+      <View style={{ alignItems: "center" }}>
+        {showOnlyLogo ? null : (
+          <Text style={[styles.title, { fontSize: fontSizes["2xl"] }]}>
+            Destined
+          </Text>
+        )}
+        {showTagline && !showOnlyLogo && (
           <Text
             style={[
               styles.title,
-              { fontSize: 16, marginTop: 5, opacity: 0.8, color: '#8A8A8A' },
+              {
+                fontSize: fontSizes.sm,
+                marginTop: spacing.md,
+                opacity: opacity.disabled,
+                color: colors.textSecondary,
+              },
             ]}
           >
             the dating app
@@ -33,17 +54,17 @@ export default LogoBranding;
 
 const styles = StyleSheet.create({
   branding: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   logo: {
-    width: 150,
-    height: 150,
-    marginBottom: 20,
+    width: buttonDimensions.logo.width,
+    height: buttonDimensions.logo.height,
+    marginBottom: spacing.xl,
   },
   title: {
-    fontSize: 24,
-    fontFamily: 'ZonaPro-Bold',
-    color: '#1E3A5F',
+    fontSize: fontSizes.lg,
+    fontFamily: fontFamilies.bold,
+    color: colors.secondary,
   },
 });

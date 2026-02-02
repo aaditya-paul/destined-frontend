@@ -1,32 +1,20 @@
-import { StyleSheet, Text, View, Alert } from 'react-native';
-import React, { useState } from 'react';
-import DecorativeStripes from '@/components/ui/DecorativeStripes';
-import LogoBranding from '@/components/ui/LogoBranding';
-import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
-import { useGoogleAuth } from '@/hooks/useGoogleAuth';
+import CTA_BTN from "@/components/ui/Cta_btn";
+import DecorativeStripes from "@/components/ui/DecorativeStripes";
+import LogoBranding from "@/components/ui/LogoBranding";
+import {
+  colors,
+  fontFamilies,
+  fontSizes,
+  lineHeights,
+  spacing,
+} from "@/constants/globalStyles";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 const LoginScreen = () => {
-  const [loading, setLoading] = useState(false);
-  const { signInWithGoogle } = useGoogleAuth();
-
-  const handleGoogleSignIn = async () => {
-    try {
-      setLoading(true);
-      const userCredential = await signInWithGoogle();
-      
-      if (userCredential) {
-        // Successfully signed in
-        console.log('User signed in:', userCredential.user);
-        // TODO: Navigate to home screen or handle authentication success
-      }
-    } catch (error: any) {
-      Alert.alert(
-        'Sign In Failed',
-        error?.message || 'An error occurred during sign in. Please try again.'
-      );
-    } finally {
-      setLoading(false);
-    }
+  const handleSignIn = () => {
+    // TODO: Add sign-in logic when backend is ready
+    console.log("Sign in pressed");
   };
 
   return (
@@ -38,7 +26,7 @@ const LoginScreen = () => {
       {/* Main Content */}
       <View style={styles.content}>
         {/* Logo and Branding */}
-        <LogoBranding showTagline={true} />
+        <LogoBranding showOnlyLogo />
 
         {/* Welcome Text */}
         <View style={styles.welcomeContainer}>
@@ -50,16 +38,17 @@ const LoginScreen = () => {
 
         {/* Sign In Button */}
         <View style={styles.buttonContainer}>
-          <GoogleSignInButton 
-            onPress={handleGoogleSignIn} 
-            loading={loading}
+          <CTA_BTN
+            btnColor={colors.secondary}
+            text="Continue with Google"
+            onPress={handleSignIn}
           />
         </View>
 
         {/* Terms and Privacy */}
         <Text style={styles.termsText}>
-          By continuing, you agree to our{'\n'}
-          <Text style={styles.termsLink}>Terms of Service</Text> and{' '}
+          By continuing, you agree to our{"\n"}
+          <Text style={styles.termsLink}>Terms of Service</Text> and{" "}
           <Text style={styles.termsLink}>Privacy Policy</Text>
         </Text>
       </View>
@@ -71,49 +60,49 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F5EFE6',
+    backgroundColor: colors.background,
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-    width: '100%',
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: spacing["2xl"],
+    width: "100%",
     gap: 40,
   },
   welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 20,
+    alignItems: "center",
+    marginTop: spacing.xl,
   },
   welcomeTitle: {
-    fontSize: 32,
-    fontFamily: 'ZonaPro-Bold',
-    color: '#1E3A5F',
-    marginBottom: 8,
+    fontSize: fontSizes.xl,
+    fontFamily: fontFamilies.bold,
+    color: colors.secondary,
+    marginBottom: spacing.sm,
   },
   welcomeSubtitle: {
-    fontSize: 16,
-    color: '#8A8A8A',
-    textAlign: 'center',
-    lineHeight: 22,
+    fontSize: fontSizes.sm,
+    color: colors.textSecondary,
+    textAlign: "center",
+    lineHeight: lineHeights.base,
   },
   buttonContainer: {
-    width: '100%',
+    width: "100%",
     maxWidth: 350,
-    marginTop: 20,
+    marginTop: spacing.xl,
   },
   termsText: {
-    fontSize: 12,
-    color: '#8A8A8A',
-    textAlign: 'center',
-    lineHeight: 18,
-    marginTop: 20,
+    fontSize: fontSizes.xs,
+    color: colors.textSecondary,
+    textAlign: "center",
+    lineHeight: lineHeights.sm,
+    marginTop: spacing.xl,
   },
   termsLink: {
-    color: '#1E3A5F',
-    fontWeight: '600',
+    color: colors.secondary,
+    fontWeight: "600",
   },
 });

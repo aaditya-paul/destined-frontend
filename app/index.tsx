@@ -12,6 +12,7 @@ const Index = () => {
   const handleGetStarted = () => {
     router.push("/login");
   };
+
   useEffect(() => {
     console.log("Mounted");
   }, []);

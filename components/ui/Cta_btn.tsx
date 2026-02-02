@@ -1,13 +1,39 @@
+import {
+  borderRadius,
+  colors,
+  fontFamilies,
+  fontSizes,
+  spacing,
+} from "@/constants/globalStyles";
+import * as Haptics from "expo-haptics";
+import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
+  useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import * as Haptics from "expo-haptics";
-
-const CTA_BTN = ({ text, onPress }: { text: string; onPress?: () => void }) => {
+interface CTA_BTNProps {
+  text: string;
+  onPress?: () => void;
+  style?: object;
+  btnColor?: string;
+  txtColor?: string;
+  txtSize?: number;
+  btnSize?: {
+    width?: number | string;
+    height?: number | string;
+  };
+}
+const CTA_BTN = ({
+  text,
+  onPress,
+  btnColor,
+  txtColor,
+  txtSize,
+  btnSize,
+  style,
+}: CTA_BTNProps) => {
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -36,8 +62,24 @@ const CTA_BTN = ({ text, onPress }: { text: string; onPress?: () => void }) => {
           });
         }}
       >
-        <Animated.View style={[styles.button, animatedStyle]}>
-          <Text style={styles.text}>{text}</Text>
+        <Animated.View
+          style={[
+            styles.button,
+            btnSize ? { width: btnSize.width, height: btnSize.height } : null,
+            btnColor ? { backgroundColor: btnColor } : null,
+            animatedStyle,
+            style,
+          ]}
+        >
+          <Text
+            style={[
+              styles.text,
+              txtColor ? { color: txtColor } : null,
+              txtSize ? { fontSize: txtSize } : null,
+            ]}
+          >
+            {text}
+          </Text>
         </Animated.View>
       </Pressable>
     </View>
@@ -48,17 +90,16 @@ export default CTA_BTN;
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#FF6347",
-    // backgroundColor: "#FF8A5B",
-    paddingVertical: 20,
-    paddingHorizontal: 40,
-    borderRadius: 25,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing["3xl"],
+    borderRadius: borderRadius.lg,
     width: "90%",
   },
   text: {
-    color: "white",
-    fontSize: 18,
+    color: colors.white,
+    fontSize: fontSizes.base,
     textAlign: "center",
-    fontFamily: "ZonaPro-Bold",
+    fontFamily: fontFamilies.bold,
   },
 });
