@@ -127,8 +127,7 @@ const BioInterestsScreen = () => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>My Interests</Text>
             <Text style={styles.sectionSubtitle}>
-              Select 3-10 interests (
-              {selectedInterests.length} selected)
+              Select 3-10 interests ({selectedInterests.length} selected)
             </Text>
             {errors.interests && (
               <Text style={styles.errorText}>{errors.interests}</Text>

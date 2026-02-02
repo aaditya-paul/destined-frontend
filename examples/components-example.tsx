@@ -1,15 +1,15 @@
 // Example: Using all components together
 
-import React, { useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
-import TextInput from "@/components/ui/TextInput";
+import CTA_BTN from "@/components/ui/Cta_btn";
 import DatePicker from "@/components/ui/DatePicker";
 import Dropdown from "@/components/ui/Dropdown";
-import InterestChip from "@/components/ui/InterestChip";
 import ImageUpload from "@/components/ui/ImageUpload";
+import InterestChip from "@/components/ui/InterestChip";
 import ProgressBar from "@/components/ui/ProgressBar";
-import CTA_BTN from "@/components/ui/Cta_btn";
+import TextInput from "@/components/ui/TextInput";
 import { colors, spacing } from "@/constants/globalStyles";
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 const ExampleScreen = () => {
   // Text Input Example

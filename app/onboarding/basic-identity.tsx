@@ -33,11 +33,7 @@ const BasicIdentityScreen = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const genderOptions = ["Man", "Woman", "Non-binary", "Prefer not to say"];
-  const lookingForOptions = [
-    "Men",
-    "Women",
-    "Everyone",
-  ];
+  const lookingForOptions = ["Men", "Women", "Everyone"];
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};

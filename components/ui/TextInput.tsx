@@ -1,17 +1,17 @@
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  TextInput as RNTextInput,
-  TextInputProps,
-  View,
-} from "react-native";
 import {
   borderRadius,
   colors,
   fontSizes,
   spacing,
 } from "@/constants/globalStyles";
+import React from "react";
+import {
+  TextInput as RNTextInput,
+  StyleSheet,
+  Text,
+  TextInputProps,
+  View,
+} from "react-native";
 
 interface CustomTextInputProps extends TextInputProps {
   label?: string;

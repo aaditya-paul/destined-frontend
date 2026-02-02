@@ -1,12 +1,12 @@
-import * as ImagePicker from "expo-image-picker";
-import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import {
   borderRadius,
   colors,
   fontSizes,
   spacing,
 } from "@/constants/globalStyles";
+import * as ImagePicker from "expo-image-picker";
+import React from "react";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 interface ImageUploadProps {
   imageUri?: string;
@@ -22,7 +22,8 @@ const ImageUpload = ({
   label,
 }: ImageUploadProps) => {
   const pickImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permissionResult.granted) {
       alert("Permission to access camera roll is required!");

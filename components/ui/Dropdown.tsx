@@ -1,3 +1,9 @@
+import {
+  borderRadius,
+  colors,
+  fontSizes,
+  spacing,
+} from "@/constants/globalStyles";
 import React, { useState } from "react";
 import {
   Modal,
@@ -7,12 +13,6 @@ import {
   Text,
   View,
 } from "react-native";
-import {
-  borderRadius,
-  colors,
-  fontSizes,
-  spacing,
-} from "@/constants/globalStyles";
 
 interface DropdownProps {
   label?: string;
@@ -47,12 +47,7 @@ const Dropdown = ({
         style={[styles.dropdown, error && styles.dropdownError]}
         onPress={() => setVisible(true)}
       >
-        <Text
-          style={[
-            styles.dropdownText,
-            !value && styles.placeholderText,
-          ]}
-        >
+        <Text style={[styles.dropdownText, !value && styles.placeholderText]}>
           {value || placeholder}
         </Text>
       </Pressable>

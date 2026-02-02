@@ -1,3 +1,10 @@
+import {
+  borderRadius,
+  colors,
+  fontSizes,
+  spacing,
+} from "@/constants/globalStyles";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
 import {
   Modal,
@@ -7,13 +14,6 @@ import {
   Text,
   View,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import {
-  borderRadius,
-  colors,
-  fontSizes,
-  spacing,
-} from "@/constants/globalStyles";
 
 interface DatePickerProps {
   label?: string;

@@ -1,6 +1,6 @@
+import { colors, spacing } from "@/constants/globalStyles";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { colors, spacing } from "@/constants/globalStyles";
 
 interface ProgressBarProps {
   totalSteps: number;
@@ -13,10 +13,7 @@ const ProgressBar = ({ totalSteps, currentStep }: ProgressBarProps) => {
       {Array.from({ length: totalSteps }).map((_, index) => (
         <View
           key={index}
-          style={[
-            styles.step,
-            index < currentStep && styles.stepActive,
-          ]}
+          style={[styles.step, index < currentStep && styles.stepActive]}
         />
       ))}
     </View>

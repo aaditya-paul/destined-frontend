@@ -10,13 +10,7 @@ import {
 } from "@/constants/globalStyles";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 
 const ProfileBuilderScreen = () => {
   const router = useRouter();
@@ -60,7 +54,7 @@ const ProfileBuilderScreen = () => {
               router.replace("/");
             },
           },
-        ]
+        ],
       );
     }
   };
@@ -121,7 +115,9 @@ const ProfileBuilderScreen = () => {
         <View style={styles.tips}>
           <Text style={styles.tipsTitle}>Photo Tips:</Text>
           <Text style={styles.tipText}>• Show your face clearly</Text>
-          <Text style={styles.tipText}>• Include variety (close-ups, full body)</Text>
+          <Text style={styles.tipText}>
+            • Include variety (close-ups, full body)
+          </Text>
           <Text style={styles.tipText}>• Use recent photos</Text>
           <Text style={styles.tipText}>• Show your hobbies and interests</Text>
           <Text style={styles.tipText}>• Smile naturally!</Text>

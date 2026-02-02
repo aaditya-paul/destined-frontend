@@ -1,12 +1,12 @@
-import * as Haptics from "expo-haptics";
-import React from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
 import {
   borderRadius,
   colors,
   fontSizes,
   spacing,
 } from "@/constants/globalStyles";
+import * as Haptics from "expo-haptics";
+import React from "react";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 interface InterestChipProps {
   label: string;
@@ -14,7 +14,11 @@ interface InterestChipProps {
   onPress?: () => void;
 }
 
-const InterestChip = ({ label, selected = false, onPress }: InterestChipProps) => {
+const InterestChip = ({
+  label,
+  selected = false,
+  onPress,
+}: InterestChipProps) => {
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress?.();
