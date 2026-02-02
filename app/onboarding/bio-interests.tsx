@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+    paddingTop: spacing.lg,
   },
   keyboardView: {
     flex: 1,

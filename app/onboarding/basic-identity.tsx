@@ -98,6 +98,8 @@ const BasicIdentityScreen = () => {
               label="First Name"
               placeholder="Enter your first name"
               value={formData.firstName}
+              keyboardType="name-phone-pad"
+              autoComplete="name-given"
               onChangeText={(text) =>
                 setFormData({ ...formData, firstName: text })
               }
@@ -107,6 +109,8 @@ const BasicIdentityScreen = () => {
 
             <TextInput
               label="Last Name"
+              keyboardType="name-phone-pad"
+              autoComplete="name-family"
               placeholder="Enter your last name"
               value={formData.lastName}
               onChangeText={(text) =>
@@ -165,6 +169,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+    paddingTop: spacing.lg,
   },
   keyboardView: {
     flex: 1,
