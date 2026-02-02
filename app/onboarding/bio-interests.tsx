@@ -4,6 +4,7 @@ import InterestChip from "@/components/ui/InterestChip";
 import ProgressBar from "@/components/ui/ProgressBar";
 import TextInput from "@/components/ui/TextInput";
 import {
+  borderRadius,
   colors,
   fontFamilies,
   fontSizes,
@@ -212,6 +213,10 @@ const styles = StyleSheet.create({
   bioInput: {
     height: 120,
     textAlignVertical: "top",
+    borderWidth: 1,
+    borderColor: colors.secondary,
+    borderRadius: borderRadius.sm,
+    padding: spacing.sm,
   },
   charCount: {
     fontSize: fontSizes.xs,

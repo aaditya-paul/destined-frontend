@@ -43,6 +43,7 @@ export const lineHeights = {
 
 // Border Radius
 export const borderRadius = {
+  sm: 10,
   md: 20,
   lg: 25,
 };
