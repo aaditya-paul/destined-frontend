@@ -54,9 +54,12 @@
       [
         "expo-font",
         {
-          "fonts": ["./assets/fonts/ZonaPro-Bold.otf"]
+          "fonts": [
+            "./assets/fonts/ZonaPro-Bold.otf"
+          ]
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

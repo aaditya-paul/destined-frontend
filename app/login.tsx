@@ -8,13 +8,18 @@ import {
   lineHeights,
   spacing,
 } from "@/constants/globalStyles";
+import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 const LoginScreen = () => {
+  const router = useRouter();
+
   const handleSignIn = () => {
     // TODO: Add sign-in logic when backend is ready
     console.log("Sign in pressed");
+    // For now, navigate to onboarding flow
+    router.push("/onboarding/basic-identity");
   };
 
   return (
