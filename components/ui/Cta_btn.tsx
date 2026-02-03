@@ -24,6 +24,8 @@ interface CTA_BTNProps {
     width?: number | string;
     height?: number | string;
   };
+  haptics?: boolean;
+  haptic_force?: "Heavy" | "Medium" | "Light" | "Rigid" | "Soft";
 }
 const CTA_BTN = ({
   text,
@@ -33,6 +35,8 @@ const CTA_BTN = ({
   txtSize,
   btnSize,
   style,
+  haptics = false,
+  haptic_force = "Medium",
 }: CTA_BTNProps) => {
   const scale = useSharedValue(1);
 
@@ -47,7 +51,9 @@ const CTA_BTN = ({
       <Pressable
         onPress={onPress}
         onPressIn={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          if (haptics) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle[haptic_force]);
+          }
           scale.value = withSpring(0.96, {
             damping: 20,
             stiffness: 200,

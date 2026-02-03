@@ -1,23 +1,13 @@
 import CTA_BTN from "@/components/ui/Cta_btn";
-import DecorativeStripes from "@/components/ui/DecorativeStripes";
+import { EditorialHeader } from "@/components/ui/EditorialComponents";
 import ImageUpload from "@/components/ui/ImageUpload";
 import ProgressBar from "@/components/ui/ProgressBar";
-import {
-  colors,
-  fontFamilies,
-  fontSizes,
-  spacing,
-} from "@/constants/globalStyles";
+import PromptModal from "@/components/ui/PromptModal";
+import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
+import { useOnboarding } from "@/context/OnboardingContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  Alert,
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 
 const { width } = Dimensions.get("window");
 const GRID_SPACING = spacing.md;
@@ -25,20 +15,45 @@ const COLUMN_WIDTH = (width - spacing["2xl"] * 2 - GRID_SPACING * 2) / 3;
 
 const ProfileBuilderScreen = () => {
   const router = useRouter();
-  const [images, setImages] = useState<(string | undefined)[]>(
-    new Array(6).fill(undefined),
-  );
+  const { data, updateData } = useOnboarding();
   const [error, setError] = useState("");
+  const [isPromptModalVisible, setIsPromptModalVisible] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
 
-  const handleImageSelect = (uri: string, index: number) => {
-    const newImages = [...images];
-    newImages[index] = uri;
-    setImages(newImages);
+  const handleImageSelect = (uris: string[], startIndex: number) => {
+    const newImages = [...data.images];
+    uris.forEach((uri, i) => {
+      const index = startIndex + i;
+      if (index < 6) {
+        // Keep existing prompt if replacing image? Or reset? Let's keep object structure but maybe reset prompt?
+        // User probably expects a fresh start for a new image.
+        newImages[index] = { uri, prompt: undefined };
+      }
+    });
+    updateData({ images: newImages });
     setError("");
   };
 
+  const openPromptModal = (index: number) => {
+    setActiveImageIndex(index);
+    setIsPromptModalVisible(true);
+  };
+
+  const handlePromptSelect = (prompt: string) => {
+    if (activeImageIndex !== null) {
+      const newImages = [...data.images];
+      const currentImage = newImages[activeImageIndex];
+      if (currentImage) {
+        newImages[activeImageIndex] = { ...currentImage, prompt };
+        updateData({ images: newImages });
+      }
+      setIsPromptModalVisible(false);
+      setActiveImageIndex(null);
+    }
+  };
+
   const validateForm = () => {
-    const uploadedImages = images.filter((img) => img !== undefined);
+    const uploadedImages = data.images.filter((img) => img !== undefined);
     if (uploadedImages.length < 2) {
       setError("Add at least 2 photos to stand out.");
       return false;
@@ -48,32 +63,21 @@ const ProfileBuilderScreen = () => {
 
   const handleComplete = () => {
     if (validateForm()) {
-      Alert.alert("Profile Locked", "Your journey begins now.", [
-        {
-          text: "Enter App",
-          onPress: () => {
-            console.log("Profile images:", images);
-            router.replace("/");
-          },
-        },
-      ]);
+      router.push("/profile-preview");
     }
   };
 
-  const uploadedCount = images.filter((img) => img !== undefined).length;
+  const uploadedCount = data.images.filter((img) => img !== undefined).length;
 
   return (
     <View style={styles.container}>
-      <DecorativeStripes position="top" />
-
       <View style={styles.topNav}>
         <ProgressBar totalSteps={3} currentStep={3} />
-        <View style={styles.header}>
-          <Text style={styles.title}>Visual Identity</Text>
-          <Text style={styles.subtitle}>
-            Select 2-6 photos to define your presence.
-          </Text>
-        </View>
+        <View style={styles.headerSpacer} />
+        <EditorialHeader
+          title="VISUAL_IDENTITY"
+          subtitle="Curate your visual presence."
+        />
       </View>
 
       <ScrollView
@@ -84,8 +88,8 @@ const ProfileBuilderScreen = () => {
           {/* Main Large Photo */}
           <View style={styles.mainSlot}>
             <ImageUpload
-              imageUri={images[0]}
-              onImageSelect={(uri) => handleImageSelect(uri, 0)}
+              imageUri={data.images[0]?.uri}
+              onImageSelect={(uris) => handleImageSelect(uris, 0)}
               size={COLUMN_WIDTH * 2 + GRID_SPACING}
               label="Primary"
             />
@@ -96,9 +100,11 @@ const ProfileBuilderScreen = () => {
             {[1, 2].map((i) => (
               <ImageUpload
                 key={i}
-                imageUri={images[i]}
-                onImageSelect={(uri) => handleImageSelect(uri, i)}
+                imageUri={data.images[i]?.uri}
+                onImageSelect={(uris) => handleImageSelect(uris, i)}
                 size={COLUMN_WIDTH}
+                selectPrompt={() => openPromptModal(i)}
+                prompt={data.images[i]?.prompt}
               />
             ))}
           </View>
@@ -108,9 +114,11 @@ const ProfileBuilderScreen = () => {
             {[3, 4, 5].map((i) => (
               <ImageUpload
                 key={i}
-                imageUri={images[i]}
-                onImageSelect={(uri) => handleImageSelect(uri, i)}
+                imageUri={data.images[i]?.uri}
+                onImageSelect={(uris) => handleImageSelect(uris, i)}
                 size={COLUMN_WIDTH}
+                selectPrompt={() => openPromptModal(i)}
+                prompt={data.images[i]?.prompt}
               />
             ))}
           </View>
@@ -119,8 +127,10 @@ const ProfileBuilderScreen = () => {
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <View style={styles.statusRow}>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{uploadedCount}/6 SLOTS FILLED</Text>
+          <View style={styles.tapeTag}>
+            <Text style={styles.tapeText}>
+              {uploadedCount}/6 SLOTS UPLOADED
+            </Text>
           </View>
         </View>
 
@@ -147,6 +157,17 @@ const ProfileBuilderScreen = () => {
       </ScrollView>
 
       {/* <DecorativeStripes position="bottom" /> */}
+
+      <PromptModal
+        visible={isPromptModalVisible}
+        onClose={() => setIsPromptModalVisible(false)}
+        onSelect={handlePromptSelect}
+        currentPrompt={
+          activeImageIndex !== null
+            ? data.images[activeImageIndex]?.prompt
+            : undefined
+        }
+      />
     </View>
   );
 };
@@ -160,25 +181,13 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
     paddingHorizontal: spacing["2xl"],
   },
-  header: {
-    marginTop: spacing.lg,
-    marginBottom: spacing.md,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: fontFamilies.bold,
-    color: colors.secondary,
-    letterSpacing: -0.5,
-    textTransform: "uppercase",
-  },
-  subtitle: {
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    opacity: 0.8,
+  headerSpacer: {
+    height: spacing.lg,
   },
   scrollContent: {
     paddingHorizontal: spacing["2xl"],
     paddingBottom: 100,
+    paddingTop: spacing.lg,
   },
   gridContainer: {
     flexDirection: "row",
@@ -202,18 +211,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginVertical: spacing.xl,
   },
-  badge: {
+
+  // Custom Badge Style (Tape)
+  tapeTag: {
     backgroundColor: colors.secondary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 4,
-    borderRadius: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    transform: [{ rotate: "-2deg" }],
   },
-  badgeText: {
+  tapeText: {
     color: colors.white,
     fontSize: 10,
     fontFamily: fontFamilies.bold,
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
+
   guideContainer: {
     borderTopWidth: 1,
     borderColor: "#EEEEEE",

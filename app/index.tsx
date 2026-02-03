@@ -1,6 +1,7 @@
 import CTA_BTN from "@/components/ui/Cta_btn";
 import DecorativeStripes from "@/components/ui/DecorativeStripes";
 import LogoBranding from "@/components/ui/LogoBranding";
+import { colors } from "@/constants/globalStyles";
 import { MICROCOPY } from "@/constants/microcopies";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
@@ -27,7 +28,12 @@ const Index = () => {
 
       {/* CTA Button */}
       <View style={{ width: "100%", position: "absolute", bottom: 50 }}>
-        <CTA_BTN text={MICROCOPY.splash.cta} onPress={handleGetStarted} />
+        <CTA_BTN
+          haptics
+          haptic_force="Heavy"
+          text={MICROCOPY.splash.cta}
+          onPress={handleGetStarted}
+        />
       </View>
     </View>
   );
@@ -37,7 +43,7 @@ export default Index;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#F5EFE6",
+    backgroundColor: colors.background,
     height: "100%",
     justifyContent: "center",
     alignItems: "center",

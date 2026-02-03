@@ -1,3 +1,4 @@
+import { OnboardingProvider } from "@/context/OnboardingContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
   DarkTheme,
@@ -15,6 +16,8 @@ export default function RootLayout() {
 
   const [loaded, error] = useFonts({
     "ZonaPro-Bold": require("@/assets/fonts/ZonaPro-Bold.otf"),
+    "ZonaPro-Light": require("@/assets/fonts/ZonaPro-ExtraLight.otf"),
+    Manrope: require("@/assets/fonts/Manrope-VariableFont_wght.ttf"),
   });
 
   if (loaded || error) {
@@ -23,20 +26,24 @@ export default function RootLayout() {
   return (
     <>
       <StatusBar hidden />
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
+      <OnboardingProvider>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="modal"
-            options={{ presentation: "modal", title: "Modal" }}
-          />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="modal"
+              options={{ presentation: "modal", title: "Modal" }}
+            />
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </OnboardingProvider>
     </>
   );
 }

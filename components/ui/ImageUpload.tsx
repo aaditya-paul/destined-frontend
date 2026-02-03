@@ -10,9 +10,11 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 interface ImageUploadProps {
   imageUri?: string;
-  onImageSelect: (uri: string) => void;
+  onImageSelect: (uris: string[]) => void;
   size?: number;
   label?: string;
+  selectPrompt?: () => void;
+  prompt?: string;
 }
 
 const ImageUpload = ({
@@ -20,6 +22,8 @@ const ImageUpload = ({
   onImageSelect,
   size = 120,
   label,
+  selectPrompt,
+  prompt,
 }: ImageUploadProps) => {
   const pickImage = async () => {
     const permissionResult =
@@ -32,13 +36,15 @@ const ImageUpload = ({
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
+      allowsEditing: false, // Turn off editing primarily to support multi-select better, though expo-image-picker handles it differently
+      allowsMultipleSelection: true,
+      selectionLimit: 6,
       quality: 0.8,
     });
 
-    if (!result.canceled && result.assets[0]) {
-      onImageSelect(result.assets[0].uri);
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const uris = result.assets.map((asset) => asset.uri);
+      onImageSelect(uris);
     }
   };
 
@@ -50,7 +56,29 @@ const ImageUpload = ({
         onPress={pickImage}
       >
         {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.image} />
+          <>
+            <Image source={{ uri: imageUri }} style={styles.image} />
+            {selectPrompt && (
+              <Pressable
+                style={styles.promptBadge}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  selectPrompt();
+                }}
+              >
+                {prompt ? (
+                  <Text style={styles.promptText} numberOfLines={1}>
+                    {prompt}
+                  </Text>
+                ) : (
+                  <View style={styles.addPromptRow}>
+                    <Text style={styles.addPromptIcon}>+</Text>
+                    <Text style={styles.addPromptText}>Prompt</Text>
+                  </View>
+                )}
+              </Pressable>
+            )}
+          </>
         ) : (
           <View style={styles.placeholder}>
             <Text style={styles.plusIcon}>+</Text>
@@ -100,5 +128,35 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: fontSizes.xs,
     color: colors.textSecondary,
+  },
+  promptBadge: {
+    position: "absolute",
+    bottom: 8,
+    alignSelf: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    maxWidth: "90%",
+  },
+  promptText: {
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: "600",
+  },
+  addPromptRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  addPromptIcon: {
+    color: colors.white,
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  addPromptText: {
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: "600",
   },
 });

@@ -6,12 +6,15 @@ export const colors = {
   secondary: "#1E3A5F",
   textSecondary: "#8A8A8A",
   white: "#FFFFFF",
-  background: "#F5EFE6",
+  black: "#000000",
+  // background: "#F5EFE6",
+  background: "#F8F8F8",
 };
 
 // Font Families
 export const fontFamilies = {
   bold: "ZonaPro-Bold",
+  variable: "ZonaPro-Variable",
 };
 
 // Font Sizes
@@ -22,6 +25,16 @@ export const fontSizes = {
   lg: 24,
   xl: 32,
   "2xl": 36,
+};
+export const generalSizes = {
+  xs: 12,
+  sm: 16,
+  md: 20,
+  lg: 24,
+  xl: 32,
+  "2xl": 40,
+  "3xl": 48,
+  "4xl": 64,
 };
 
 // Spacing (padding, margin)

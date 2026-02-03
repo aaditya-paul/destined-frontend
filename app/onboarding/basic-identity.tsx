@@ -1,14 +1,11 @@
 import CTA_BTN from "@/components/ui/Cta_btn";
 import DatePicker from "@/components/ui/DatePicker";
 import Dropdown from "@/components/ui/Dropdown";
+import { EditorialHeader } from "@/components/ui/EditorialComponents";
 import ProgressBar from "@/components/ui/ProgressBar";
 import TextInput from "@/components/ui/TextInput";
-import {
-  colors,
-  fontFamilies,
-  fontSizes,
-  spacing,
-} from "@/constants/globalStyles";
+import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
+import { useOnboarding } from "@/context/OnboardingContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -22,13 +19,7 @@ import {
 
 const BasicIdentityScreen = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    dateOfBirth: new Date(2000, 0, 1),
-    gender: "",
-    lookingFor: "",
-  });
+  const { data, updateData } = useOnboarding();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const genderOptions = ["Man", "Woman", "Non-binary", "Prefer not to say"];
@@ -36,14 +27,20 @@ const BasicIdentityScreen = () => {
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-    if (!formData.firstName.trim()) newErrors.firstName = "FIRST NAME REQUIRED";
-    if (!formData.lastName.trim()) newErrors.lastName = "LAST NAME REQUIRED";
+    if (!data.firstName.trim()) newErrors.firstName = "FIRST NAME REQUIRED";
+    if (!data.lastName.trim()) newErrors.lastName = "LAST NAME REQUIRED";
 
-    const age = new Date().getFullYear() - formData.dateOfBirth.getFullYear();
+    const age = new Date().getFullYear() - data.dateOfBirth.getFullYear();
     if (age < 18) newErrors.dateOfBirth = "MINIMUM AGE IS 18";
 
-    if (!formData.gender) newErrors.gender = "SELECT YOUR GENDER";
-    if (!formData.lookingFor) newErrors.lookingFor = "SELECT PREFERENCE";
+    if (!data.gender) newErrors.gender = "SELECT YOUR GENDER";
+    if (!data.lookingFor) newErrors.lookingFor = "SELECT PREFERENCE";
+
+    // New fields validation (optional but good to have basic check)
+    if (!data.location.trim()) newErrors.location = "LOCATION REQUIRED";
+    if (!data.height.trim()) newErrors.height = "HEIGHT REQUIRED";
+    if (!data.jobTitle.trim()) newErrors.jobTitle = "JOB TITLE REQUIRED";
+    if (!data.school.trim()) newErrors.school = "SCHOOL/ALMA MATER REQUIRED";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -57,16 +54,13 @@ const BasicIdentityScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* <DecorativeStripes position="top" /> */}
-
       <View style={styles.topNav}>
         <ProgressBar totalSteps={3} currentStep={1} />
-        <View style={styles.header}>
-          <Text style={styles.title}>The Foundation</Text>
-          <Text style={styles.subtitle}>
-            Enter your core details to initialize your profile.
-          </Text>
-        </View>
+        <View style={styles.headerSpacer} />
+        <EditorialHeader
+          title="THE_FOUNDATION"
+          subtitle="Initialize your profile parameters."
+        />
       </View>
 
       <KeyboardAvoidingView
@@ -81,68 +75,106 @@ const BasicIdentityScreen = () => {
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>IDENTIFICATION</Text>
             <View style={styles.formGroup}>
-              <TextInput
-                label="FIRST NAME"
-                placeholder="John"
-                value={formData.firstName}
-                onChangeText={(text) =>
-                  setFormData({ ...formData, firstName: text })
-                }
-                error={errors.firstName}
-                autoCapitalize="words"
-                // labelStyle={styles.inputLabel}
-              />
-              <TextInput
-                label="LAST NAME"
-                placeholder="Doe"
-                value={formData.lastName}
-                onChangeText={(text) =>
-                  setFormData({ ...formData, lastName: text })
-                }
-                error={errors.lastName}
-                autoCapitalize="words"
-                // labelStyle={styles.inputLabel}
-              />
+              <View style={styles.row}>
+                <View style={{ flex: 1 }}>
+                  <TextInput
+                    label="FIRST NAME"
+                    placeholder="E.g. John"
+                    value={data.firstName}
+                    onChangeText={(text) => updateData({ firstName: text })}
+                    error={errors.firstName}
+                    autoCapitalize="words"
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <TextInput
+                    label="LAST NAME"
+                    placeholder="E.g. Doe"
+                    value={data.lastName}
+                    onChangeText={(text) => updateData({ lastName: text })}
+                    error={errors.lastName}
+                    autoCapitalize="words"
+                  />
+                </View>
+              </View>
             </View>
           </View>
 
-          {/* Vital Stats Block */}
+          {/* Vitals Block */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>VITAL STATS</Text>
+            <Text style={styles.sectionLabel}>VITALS & SPECS</Text>
             <View style={styles.formGroup}>
               <DatePicker
                 label="DATE OF BIRTH"
-                value={formData.dateOfBirth}
-                onChange={(date) =>
-                  setFormData({ ...formData, dateOfBirth: date })
-                }
+                value={data.dateOfBirth}
+                onChange={(date) => updateData({ dateOfBirth: date })}
                 error={errors.dateOfBirth}
               />
 
-              <View style={styles.dropdownRow}>
+              <View style={styles.row}>
                 <View style={{ flex: 1 }}>
                   <Dropdown
-                    label="YOUR GENDER"
-                    value={formData.gender}
+                    label="GENDER"
+                    value={data.gender}
                     options={genderOptions}
-                    onChange={(value) =>
-                      setFormData({ ...formData, gender: value })
-                    }
+                    onChange={(value) => updateData({ gender: value as any })}
                     placeholder="Select"
                     error={errors.gender}
                   />
                 </View>
+                <View style={{ flex: 1 }}>
+                  <TextInput
+                    label="HEIGHT"
+                    placeholder="E.g. 6'1" // Keeping it text for now for simplicity
+                    value={data.height}
+                    onChangeText={(text) => updateData({ height: text })}
+                    error={errors.height}
+                  />
+                </View>
+              </View>
+
+              <View style={{ zIndex: 999 }}>
+                {/* Dropdown container z-index fix if needed */}
               </View>
 
               <Dropdown
                 label="INTERESTED IN"
-                value={formData.lookingFor}
+                value={data.lookingFor}
                 options={lookingForOptions}
-                onChange={(value) =>
-                  setFormData({ ...formData, lookingFor: value })
-                }
+                onChange={(value) => updateData({ lookingFor: value as any })}
                 placeholder="Select preference"
                 error={errors.lookingFor}
+              />
+            </View>
+          </View>
+
+          {/* Background Block */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>BACKGROUND</Text>
+            <View style={styles.formGroup}>
+              <TextInput
+                label="CURRENT LOCATION"
+                placeholder="City, Country"
+                value={data.location}
+                onChangeText={(text) => updateData({ location: text })}
+                error={errors.location}
+                autoCapitalize="words"
+              />
+              <TextInput
+                label="JOB TITLE"
+                placeholder="E.g. Architect"
+                value={data.jobTitle}
+                onChangeText={(text) => updateData({ jobTitle: text })}
+                error={errors.jobTitle}
+                autoCapitalize="words"
+              />
+              <TextInput
+                label="DEGREE / SCHOOL"
+                placeholder="E.g. IIT Tech"
+                value={data.school}
+                onChangeText={(text) => updateData({ school: text })}
+                error={errors.school}
+                autoCapitalize="words"
               />
             </View>
           </View>
@@ -159,8 +191,6 @@ const BasicIdentityScreen = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-
-      {/* <DecorativeStripes position="bottom" /> */}
     </View>
   );
 };
@@ -174,21 +204,8 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
     paddingHorizontal: spacing["2xl"],
   },
-  header: {
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: fontFamilies.bold,
-    color: colors.secondary,
-    letterSpacing: -0.5,
-    textTransform: "uppercase",
-  },
-  subtitle: {
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    opacity: 0.8,
+  headerSpacer: {
+    height: spacing.lg,
   },
   keyboardView: {
     flex: 1,
@@ -196,7 +213,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: spacing["2xl"],
     paddingBottom: 120,
-    paddingTop: spacing.xl,
+    paddingTop: spacing.lg,
   },
   section: {
     marginBottom: spacing["2xl"],
@@ -210,15 +227,9 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   formGroup: {
-    gap: spacing.xs,
+    gap: spacing.md,
   },
-  inputLabel: {
-    fontSize: 12,
-    fontFamily: fontFamilies.bold,
-    color: colors.secondary,
-    letterSpacing: 1,
-  },
-  dropdownRow: {
+  row: {
     flexDirection: "row",
     gap: spacing.md,
   },

@@ -1,13 +1,14 @@
 import CTA_BTN from "@/components/ui/Cta_btn";
+import {
+  EditorialHeader,
+  LikeableCard,
+} from "@/components/ui/EditorialComponents";
 import InterestChip from "@/components/ui/InterestChip";
 import ProgressBar from "@/components/ui/ProgressBar";
 import TextInput from "@/components/ui/TextInput";
-import {
-  colors,
-  fontFamilies,
-  fontSizes,
-  spacing,
-} from "@/constants/globalStyles";
+import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
+import { useOnboarding } from "@/context/OnboardingContext";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -16,14 +17,17 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
 const BioInterestsScreen = () => {
   const router = useRouter();
-  const [bio, setBio] = useState("");
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const { data, updateData } = useOnboarding();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // Local state for Poll editing (simplified for now)
+  const [pollQuestion, setPollQuestion] = useState(data.poll.question);
 
   const availableInterests = [
     "Travel",
@@ -49,19 +53,20 @@ const BioInterestsScreen = () => {
   ];
 
   const toggleInterest = (interest: string) => {
-    if (selectedInterests.includes(interest)) {
-      setSelectedInterests(selectedInterests.filter((i) => i !== interest));
-    } else if (selectedInterests.length < 10) {
-      setSelectedInterests([...selectedInterests, interest]);
+    const current = data.interests;
+    if (current.includes(interest)) {
+      updateData({ interests: current.filter((i) => i !== interest) });
+    } else if (current.length < 10) {
+      updateData({ interests: [...current, interest] });
     }
   };
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-    if (!bio.trim() || bio.trim().length < 20) {
+    if (!data.bio.trim() || data.bio.trim().length < 20) {
       newErrors.bio = "YOUR STORY NEEDS MORE DETAIL (MIN 20 CHARS).";
     }
-    if (selectedInterests.length < 3) {
+    if (data.interests.length < 3) {
       newErrors.interests = "SELECT AT LEAST 3 ATTRIBUTES.";
     }
     setErrors(newErrors);
@@ -69,6 +74,14 @@ const BioInterestsScreen = () => {
   };
 
   const handleContinue = () => {
+    // Save local poll state to context before continuing
+    updateData({
+      poll: {
+        ...data.poll,
+        question: pollQuestion,
+      },
+    });
+
     if (validateForm()) {
       router.push("/onboarding/profile-builder");
     }
@@ -76,16 +89,13 @@ const BioInterestsScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* <DecorativeStripes position="top" /> */}
-
       <View style={styles.topNav}>
         <ProgressBar totalSteps={3} currentStep={2} />
-        <View style={styles.header}>
-          <Text style={styles.title}>The Narrative</Text>
-          <Text style={styles.subtitle}>
-            Define your character and what drives you.
-          </Text>
-        </View>
+        <View style={styles.headerSpacer} />
+        <EditorialHeader
+          title="THE_NARRATIVE"
+          subtitle="Define your character and voice."
+        />
       </View>
 
       <KeyboardAvoidingView
@@ -99,20 +109,20 @@ const BioInterestsScreen = () => {
           {/* Bio Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.label}>PERSONAL STATEMENT</Text>
+              <Text style={styles.sectionLabel}>PERSONAL STATEMENT</Text>
               <Text
                 style={[
                   styles.charCount,
-                  bio.length > 450 && { color: colors.primary },
+                  data.bio.length > 450 && { color: colors.primary },
                 ]}
               >
-                {bio.length}/500
+                {data.bio.length}/500
               </Text>
             </View>
             <TextInput
               placeholder="What makes you... you?"
-              value={bio}
-              onChangeText={setBio}
+              value={data.bio}
+              onChangeText={(text) => updateData({ bio: text })}
               error={errors.bio}
               multiline
               numberOfLines={6}
@@ -124,18 +134,14 @@ const BioInterestsScreen = () => {
           {/* Interests Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.label}>ATTRIBUTES & INTERESTS</Text>
+              <Text style={styles.sectionLabel}>ATTRIBUTES & INTERESTS</Text>
               <Text style={styles.selectionCount}>
-                {selectedInterests.length}/10
+                {data.interests.length}/10
               </Text>
             </View>
 
-            {errors.interests ? (
+            {errors.interests && (
               <Text style={styles.errorText}>{errors.interests}</Text>
-            ) : (
-              <Text style={styles.sectionSubtitle}>
-                Select 3-10 tags that resonate with you.
-              </Text>
             )}
 
             <View style={styles.interestsContainer}>
@@ -143,11 +149,85 @@ const BioInterestsScreen = () => {
                 <InterestChip
                   key={interest}
                   label={interest}
-                  selected={selectedInterests.includes(interest)}
+                  selected={data.interests.includes(interest)}
                   onPress={() => toggleInterest(interest)}
                 />
               ))}
             </View>
+          </View>
+
+          {/* Voice Prompt (Mock Recording) */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>AUDIO LOG</Text>
+            <LikeableCard hideLikeBtn={true}>
+              <View style={styles.voiceCardContent}>
+                <View style={styles.voiceHeader}>
+                  <Text style={styles.voiceLabel}>RECORD 15 SEC INTRO</Text>
+                  {data.voiceNoteDuration ? (
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={16}
+                      color={colors.primary}
+                    />
+                  ) : (
+                    <Ionicons
+                      name="mic-outline"
+                      size={16}
+                      color={colors.textSecondary}
+                    />
+                  )}
+                </View>
+
+                <TouchableOpacity
+                  style={[
+                    styles.recordButton,
+                    data.voiceNoteDuration ? styles.recordButtonActive : {},
+                  ]}
+                  onPress={() =>
+                    updateData({
+                      voiceNoteDuration: data.voiceNoteDuration ? null : "0:15",
+                    })
+                  }
+                >
+                  <Ionicons
+                    name={data.voiceNoteDuration ? "stop" : "mic"}
+                    size={24}
+                    color={colors.white}
+                  />
+                </TouchableOpacity>
+
+                <Text style={styles.voiceHint}>
+                  {data.voiceNoteDuration ? "AUDIO CAPTURED" : "TAP TO RECORD"}
+                </Text>
+              </View>
+            </LikeableCard>
+          </View>
+
+          {/* Poll Creation (Simplified) */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>QUERY INTERFACE</Text>
+            <LikeableCard hideLikeBtn={true}>
+              <View style={styles.pollCardContent}>
+                <TextInput
+                  label="POLL QUESTION"
+                  value={pollQuestion}
+                  onChangeText={setPollQuestion}
+                  placeholder="Ask something..."
+                  containerStyle={{ marginBottom: spacing.md }}
+                />
+                <View style={styles.pollOptionVisual}>
+                  {data.poll.options.map((opt, i) => (
+                    <View key={i} style={styles.pollOptionRow}>
+                      <View style={styles.pollBar} />
+                      <Text style={styles.pollOptionText}>{opt.label}</Text>
+                    </View>
+                  ))}
+                </View>
+                <Text style={styles.pollHint}>
+                  *Options are set to default for demo*
+                </Text>
+              </View>
+            </LikeableCard>
           </View>
 
           <View style={styles.buttonContainer}>
@@ -156,13 +236,12 @@ const BioInterestsScreen = () => {
               onPress={handleContinue}
               btnColor={colors.primary}
             />
-            <Text style={styles.backLink} onPress={() => router.back()}>
-              GO BACK
-            </Text>
+            <TouchableOpacity onPress={() => router.back()}>
+              <Text style={styles.backLink}>GO BACK</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      {/* <DecorativeStripes position="bottom" /> */}
     </View>
   );
 };
@@ -176,21 +255,8 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
     paddingHorizontal: spacing["2xl"],
   },
-  header: {
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: fontFamilies.bold,
-    color: colors.secondary,
-    letterSpacing: -0.5,
-    textTransform: "uppercase",
-  },
-  subtitle: {
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    opacity: 0.8,
+  headerSpacer: {
+    height: spacing.lg,
   },
   keyboardView: {
     flex: 1,
@@ -198,10 +264,10 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: spacing["2xl"],
     paddingBottom: 120,
-    paddingTop: spacing.xl,
+    paddingTop: spacing.lg,
   },
   section: {
-    marginBottom: spacing["3xl"],
+    marginBottom: spacing["2xl"],
   },
   sectionHeader: {
     flexDirection: "row",
@@ -209,11 +275,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: spacing.md,
   },
-  label: {
-    fontSize: 12,
+  sectionLabel: {
+    fontSize: 10,
     fontFamily: fontFamilies.bold,
-    color: colors.secondary,
-    letterSpacing: 1.5,
+    color: colors.textSecondary,
+    letterSpacing: 2.5,
+    marginBottom: spacing.lg,
+    opacity: 0.6,
   },
   bioInput: {
     minHeight: 140,
@@ -224,18 +292,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: spacing.md,
     fontSize: 15,
+    fontFamily: fontFamilies.variable,
     lineHeight: 22,
   },
   charCount: {
     fontSize: 10,
     fontFamily: fontFamilies.bold,
     color: colors.textSecondary,
-  },
-  sectionSubtitle: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginBottom: spacing.md,
-    fontStyle: "italic",
   },
   selectionCount: {
     fontSize: 10,
@@ -254,6 +317,82 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     textTransform: "uppercase",
   },
+
+  // Voice Card
+  voiceCardContent: {
+    padding: spacing.lg,
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  voiceHeader: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  voiceLabel: {
+    fontSize: 10,
+    fontFamily: fontFamilies.bold,
+    color: colors.textSecondary,
+    letterSpacing: 1.5,
+  },
+  recordButton: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.secondary,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: spacing.xs,
+  },
+  recordButtonActive: {
+    backgroundColor: colors.primary,
+  },
+  voiceHint: {
+    fontSize: 10,
+    fontFamily: fontFamilies.bold,
+    color: colors.secondary,
+    opacity: 0.8,
+    letterSpacing: 2,
+  },
+
+  // Poll Card
+  pollCardContent: {
+    padding: spacing.lg,
+  },
+  pollOptionVisual: {
+    gap: 8,
+    marginTop: spacing.sm,
+    opacity: 0.6,
+  },
+  pollOptionRow: {
+    backgroundColor: "#F5F5F5",
+    padding: 12,
+    borderRadius: 8,
+    overflow: "hidden",
+    position: "relative",
+  },
+  pollBar: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: "30%",
+    backgroundColor: "#E0E0E0",
+  },
+  pollOptionText: {
+    fontSize: 12,
+    fontFamily: fontFamilies.bold,
+    color: colors.textSecondary,
+  },
+  pollHint: {
+    marginTop: spacing.md,
+    fontSize: 10,
+    color: colors.textSecondary,
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+
   buttonContainer: {
     marginTop: spacing.lg,
     gap: spacing.lg,
