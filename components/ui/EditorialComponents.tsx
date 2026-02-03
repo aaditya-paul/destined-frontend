@@ -41,6 +41,7 @@ export const LikeableCard = ({
           size={generalSizes.xl}
           onPress={onLike || (() => {})}
           haptics={true}
+          border={false}
         />
       </View>
     )}

@@ -25,9 +25,9 @@
       ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/destined_512_logo.png",
-        "backgroundImage": "./assets/images/destined_512_logo.png",
-        "monochromeImage": "./assets/images/destined_512_logo.png"
+        "foregroundImage": "./assets/images/android_logo.png",
+        "backgroundImage": "./assets/images/android_logo.png",
+        "monochromeImage": "./assets/images/android_logo.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -54,9 +54,7 @@
       [
         "expo-font",
         {
-          "fonts": [
-            "./assets/fonts/ZonaPro-Bold.otf"
-          ]
+          "fonts": ["./assets/fonts/ZonaPro-Bold.otf"]
         }
       ],
       "@react-native-community/datetimepicker"
