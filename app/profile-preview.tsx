@@ -139,35 +139,33 @@ const ProfilePreviewScreen = () => {
             </View>
           </View>
 
-          {/* DYNAMIC FEED: Mixed content */}
-          {/* Render remaining images and other sections freely */}
-
-          {data.images.slice(1).map((img, index) => {
-            if (!img?.uri) return null;
-            return (
-              <LikeableCard key={`img-${index}`}>
-                <View style={styles.imageContainer}>
-                  <Image source={{ uri: img.uri }} style={styles.feedImage} />
+          {/* --- SLOT 1: Image 1 --- */}
+          {data.images[1]?.uri && (
+            <LikeableCard>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={{ uri: data.images[1]?.uri }}
+                  style={styles.feedImage}
+                />
+                {data.images[1]?.prompt && (
                   <View style={styles.tapeTag}>
                     <Text style={styles.tapeText}>
-                      {img.prompt
-                        ? `// ${img.prompt.toUpperCase()}`
-                        : "// NO CONTEXT"}
+                      {`// ${data.images[1].prompt.toUpperCase()}`}
                     </Text>
                   </View>
-                </View>
-              </LikeableCard>
-            );
-          })}
+                )}
+              </View>
+            </LikeableCard>
+          )}
 
-          {/* VOICE LOG (Likeable) */}
+          {/* --- SLOT 2: Voice --- */}
           {data.voiceNoteDuration && (
             <LikeableCard>
               <VoicePrompt duration={data.voiceNoteDuration} />
             </LikeableCard>
           )}
 
-          {/* THE PLOT / BIO (Now Likeable) */}
+          {/* --- SLOT 3: Bio --- */}
           {data.bio && (
             <LikeableCard>
               <View style={styles.cardPadding}>
@@ -177,7 +175,26 @@ const ProfilePreviewScreen = () => {
             </LikeableCard>
           )}
 
-          {/* POLL (Likeable) */}
+          {/* --- SLOT 4: Image 2 --- */}
+          {data.images[2]?.uri && (
+            <LikeableCard>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={{ uri: data.images[2]?.uri }}
+                  style={styles.feedImage}
+                />
+                {data.images[2]?.prompt && (
+                  <View style={styles.tapeTag}>
+                    <Text style={styles.tapeText}>
+                      {`// ${data.images[2].prompt.toUpperCase()}`}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </LikeableCard>
+          )}
+
+          {/* --- SLOT 5: Poll --- */}
           <LikeableCard>
             <PollSection
               question={data.poll.question || "Help me decide?"}
@@ -185,7 +202,26 @@ const ProfilePreviewScreen = () => {
             />
           </LikeableCard>
 
-          {/* THE ROTATION (Static) */}
+          {/* --- SLOT 6: Image 3 --- */}
+          {data.images[3]?.uri && (
+            <LikeableCard>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={{ uri: data.images[3]?.uri }}
+                  style={styles.feedImage}
+                />
+                {data.images[3]?.prompt && (
+                  <View style={styles.tapeTag}>
+                    <Text style={styles.tapeText}>
+                      {`// ${data.images[3].prompt.toUpperCase()}`}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </LikeableCard>
+          )}
+
+          {/* --- SLOT 7: Interests --- */}
           <View style={styles.staticSection}>
             <EditorialHeader title="THE ROTATION" />
             <View style={styles.interestsWrapper}>
@@ -202,6 +238,25 @@ const ProfilePreviewScreen = () => {
               )}
             </View>
           </View>
+
+          {/* --- SLOT 8+: Remaining Images (4, 5) --- */}
+          {data.images.slice(4).map((img, index) => {
+            if (!img?.uri) return null;
+            return (
+              <LikeableCard key={`remaining-img-${index}`}>
+                <View style={styles.imageContainer}>
+                  <Image source={{ uri: img.uri }} style={styles.feedImage} />
+                  {img.prompt && (
+                    <View style={styles.tapeTag}>
+                      <Text style={styles.tapeText}>
+                        {`// ${img.prompt.toUpperCase()}`}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </LikeableCard>
+            );
+          })}
         </View>
       </ScrollView>
 
