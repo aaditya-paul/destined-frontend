@@ -129,7 +129,7 @@ export default function HomeScreen() {
         nextTranslateYAnim.setValue(20);
 
         setIsAnimating(false);
-        
+
         // Scroll to top
         setTimeout(() => {
           scrollViewRef.current?.scrollTo({ y: 0, animated: false });
@@ -152,7 +152,11 @@ export default function HomeScreen() {
     ? new Date().getFullYear() - currentProfile.dateOfBirth.getFullYear()
     : "";
 
-  const renderProfile = (profile: typeof currentProfile, isNext = false, profileIndex: number) => {
+  const renderProfile = (
+    profile: typeof currentProfile,
+    isNext = false,
+    profileIndex: number,
+  ) => {
     const age = profile.dateOfBirth
       ? new Date().getFullYear() - profile.dateOfBirth.getFullYear()
       : "";
@@ -358,7 +362,11 @@ export default function HomeScreen() {
           },
         ]}
       >
-        {renderProfile(nextProfile, true, (currentIndex + 1) % dummyProfiles.length)}
+        {renderProfile(
+          nextProfile,
+          true,
+          (currentIndex + 1) % dummyProfiles.length,
+        )}
       </Animated.View>
 
       {/* Current Profile (Front) */}
@@ -413,8 +421,19 @@ const styles = StyleSheet.create({
   rowBetween: { flexDirection: "row", justifyContent: "space-between" },
 
   // Hero Section
-  heroContainer: { width, height: height * 0.75, marginBottom: spacing["3xl"] },
-  heroImage: { width: "100%", height: "100%", resizeMode: "cover" },
+  heroContainer: {
+    width,
+    height: height * 0.75,
+    marginBottom: spacing["3xl"],
+    borderBottomLeftRadius: generalSizes["2xl"],
+    borderBottomRightRadius: generalSizes["2xl"],
+    overflow: "hidden",
+  },
+  heroImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
   gradient: { position: "absolute", bottom: 0, width: "100%", height: "40%" },
   heroTextContainer: { position: "absolute", bottom: 40, left: spacing["2xl"] },
   heroTag: {

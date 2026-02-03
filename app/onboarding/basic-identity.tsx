@@ -22,8 +22,43 @@ const BasicIdentityScreen = () => {
   const { data, updateData } = useOnboarding();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+  // Parse existing height or default to empty
+  const parseHeight = (heightStr: string) => {
+    const match = heightStr.match(/(\d+)'(\d+)"/);
+    if (match) {
+      return { feet: match[1], inches: match[2] };
+    }
+    return { feet: "", inches: "" };
+  };
+
+  const [heightFeet, setHeightFeet] = useState(parseHeight(data.height).feet);
+  const [heightInches, setHeightInches] = useState(
+    parseHeight(data.height).inches,
+  );
+
   const genderOptions = ["Man", "Woman", "Non-binary", "Prefer not to say"];
   const lookingForOptions = ["Men", "Women", "Everyone"];
+  const feetOptions = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  const inchesOptions = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+  ];
+
+  const updateHeight = (feet: string, inches: string) => {
+    if (feet && inches) {
+      updateData({ height: `${feet}'${inches}"` });
+    }
+  };
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -111,24 +146,39 @@ const BasicIdentityScreen = () => {
                 error={errors.dateOfBirth}
               />
 
-              <View style={styles.row}>
+              <Dropdown
+                label="GENDER"
+                value={data.gender}
+                options={genderOptions}
+                onChange={(value) => updateData({ gender: value as any })}
+                placeholder="Select"
+                error={errors.gender}
+              />
+
+              <View style={styles.heightRow}>
                 <View style={{ flex: 1 }}>
                   <Dropdown
-                    label="GENDER"
-                    value={data.gender}
-                    options={genderOptions}
-                    onChange={(value) => updateData({ gender: value as any })}
-                    placeholder="Select"
-                    error={errors.gender}
+                    label="HEIGHT (FT)"
+                    value={heightFeet}
+                    options={feetOptions}
+                    onChange={(value) => {
+                      setHeightFeet(value);
+                      updateHeight(value, heightInches);
+                    }}
+                    placeholder="0"
+                    error={errors.height}
                   />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <TextInput
-                    label="HEIGHT"
-                    placeholder="E.g. 6'1" // Keeping it text for now for simplicity
-                    value={data.height}
-                    onChangeText={(text) => updateData({ height: text })}
-                    error={errors.height}
+                  <Dropdown
+                    label="HEIGHT (IN)"
+                    value={heightInches}
+                    options={inchesOptions}
+                    onChange={(value) => {
+                      setHeightInches(value);
+                      updateHeight(heightFeet, value);
+                    }}
+                    placeholder="0"
                   />
                 </View>
               </View>
@@ -232,6 +282,10 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     gap: spacing.md,
+  },
+  heightRow: {
+    flexDirection: "row",
+    gap: spacing.sm,
   },
   buttonContainer: {
     marginTop: spacing.xl,
