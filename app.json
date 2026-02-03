@@ -12,17 +12,6 @@
       "supportsTablet": true
     },
     "android": {
-      "fonts": [
-        {
-          "fontFamily": "ZonaPro-Bold",
-          "fontDefinitions": [
-            {
-              "path": "./assets/fonts/ZonaPro-Bold.otf",
-              "weight": "700"
-            }
-          ]
-        }
-      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android_logo.png",
