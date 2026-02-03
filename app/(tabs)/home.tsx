@@ -1,7 +1,7 @@
+import { ProfileView } from "@/components/ProfileView";
 import { LikeButton, PassButton } from "@/components/ui/like_unline_actionsBtn";
 import { colors, generalSizes } from "@/constants/globalStyles";
 import { dummyProfiles } from "@/data/dummyData";
-import { ProfileView } from "@/components/ProfileView";
 import React, { useRef, useState } from "react";
 import {
   Animated,

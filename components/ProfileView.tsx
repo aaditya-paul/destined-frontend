@@ -3,11 +3,7 @@ import {
   LikeableCard,
 } from "@/components/ui/EditorialComponents";
 import InterestChip from "@/components/ui/InterestChip";
-import {
-  colors,
-  fontFamilies,
-  spacing,
-} from "@/constants/globalStyles";
+import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
 import { OnboardingData } from "@/context/types";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -219,7 +215,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile }) => {
                 <InterestChip key={item} label={item} selected={true} />
               ))
             ) : (
-              <Text style={{ color: colors.textSecondary, fontStyle: "italic" }}>
+              <Text
+                style={{ color: colors.textSecondary, fontStyle: "italic" }}
+              >
                 No interests added yet.
               </Text>
             )}

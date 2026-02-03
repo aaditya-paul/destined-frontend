@@ -1,7 +1,7 @@
+import { ProfileView } from "@/components/ProfileView";
 import { LikeButton, PassButton } from "@/components/ui/like_unline_actionsBtn";
 import { colors, generalSizes, spacing } from "@/constants/globalStyles";
 import { useOnboarding } from "@/context/OnboardingContext";
-import { ProfileView } from "@/components/ProfileView";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
