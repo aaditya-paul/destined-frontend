@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
+    zIndex: 20,
   },
   likeBtn: {
     width: generalSizes.lg,
@@ -143,5 +144,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
+    zIndex: 20,
   },
 });
