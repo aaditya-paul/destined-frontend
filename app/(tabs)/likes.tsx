@@ -299,6 +299,105 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     marginTop: 5,
     fontFamily: "Manrope",
+    marginLeft: 4,
+  },
+  profileInfo: {
+    padding: 20,
+  },
+  nameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  name: {
+    fontSize: 24,
+    fontFamily: "Manrope-Bold",
+    color: "#333",
+    marginRight: 8,
+  },
+  distance: {
+    fontSize: 14,
+    color: "#666",
+    marginLeft: 4,
+  },
+  bio: {
+    fontSize: 16,
+    color: "#555",
+    lineHeight: 22,
+    marginBottom: 20,
+    fontFamily: "Manrope",
+  },
+  actionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  iconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  passCircle: {
+    backgroundColor: "#FFF0F0",
+  },
+  messageCircle: {
+    backgroundColor: "#F0F0F0",
+  },
+  likeCircle: {
+    backgroundColor: "#F0FFF0",
+  },
+  passButton: {
+    alignItems: "center",
+  },
+  messageButton: {
+    alignItems: "center",
+  },
+  likeButton: {
+    alignItems: "center",
+  },
+  passText: {
+    fontSize: 12,
+    color: "#FF6B6B",
+    fontFamily: "Manrope-SemiBold",
+  },
+  messageText: {
+    fontSize: 12,
+    color: "#666",
+    fontFamily: "Manrope-SemiBold",
+  },
+  likeText: {
+    fontSize: 12,
+    color: "#4CAF50",
+    fontFamily: "Manrope-SemiBold",
+  },
+  premiumCard: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 30,
+    marginTop: 10,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#FFD700",
+  },
+  premiumContent: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  premiumTitle: {
+    fontSize: 18,
+    fontFamily: "Manrope-Bold",
+    color: "#333",
+    marginBottom: 5,
+  },
+  premiumText: {
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 20,
   },
   likedTimeRow: {
     flexDirection: "row",
