@@ -1,149 +1,186 @@
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, Dimensions } from "react-native";
 import { colors } from "@constants/globalStyles";
 import { Ionicons } from "@expo/vector-icons";
+//comment
+const { width } = Dimensions.get("window");
 
 export default function LikesScreen() {
-  // FREE VERSION - No blurry images!
-  const freeLikes = [
+  // Dating app style data
+  const likes = [
     {
       id: 1,
       name: "Alex",
       age: 26,
       distance: "2 km away",
-      bio: "Coffee lover • Travel addict",
-      likedYouAt: "Today, 10:30 AM",
-      image: "https://randomuser.me/api/portraits/men/32.jpg",
-      isNew: true, // New like (you haven't seen yet)
+      bio: "Coffee lover • Travel addict • Adventure seeker",
+      time: "Just now",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+      isOnline: true,
+      isSuperLike: false,
     },
     {
       id: 2,
       name: "Sophia",
       age: 24,
       distance: "5 km away",
-      bio: "Artist • Dog mom",
-      likedYouAt: "Yesterday, 3:15 PM",
-      image: "https://randomuser.me/api/portraits/women/44.jpg",
-      isNew: false,
+      bio: "Artist • Dog mom • Love sunset walks",
+      time: "10 min ago",
+      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w-400&h=400&fit=crop",
+      isOnline: true,
+      isSuperLike: true, // Gold border for super like
     },
     {
       id: 3,
       name: "Jordan",
       age: 28,
       distance: "1 km away",
-      bio: "Gym enthusiast • Foodie",
-      likedYouAt: "2 days ago",
-      image: "https://randomuser.me/api/portraits/women/68.jpg",
-      isNew: true,
+      bio: "Gym enthusiast • Foodie • Netflix & chill",
+      time: "1 hour ago",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
+      isOnline: false,
+      isSuperLike: false,
     },
     {
       id: 4,
       name: "Mike",
       age: 30,
       distance: "3 km away",
-      bio: "Musician • Photographer",
-      likedYouAt: "3 days ago",
-      image: "https://randomuser.me/api/portraits/men/22.jpg",
-      isNew: false,
+      bio: "Musician • Photographer • Coffee addict",
+      time: "2 hours ago",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+      isOnline: true,
+      isSuperLike: false,
     },
   ];
 
-  const handleLikeBack = (id: number) => {
-    alert(`Liked back user ${id}! It's a MATCH!`);
-    // Here you would call API to create a match
+  const handleLike = (id: number) => {
+    // Like back - create match
+    alert(`🎉 It's a match! You liked back.`);
   };
 
   const handlePass = (id: number) => {
-    alert(`Passed on user ${id}`);
-    // Here you would call API to pass/reject
+    // Pass on this like
+    alert(`Passed on this profile.`);
+  };
+
+  const handleMessage = (id: number) => {
+    // Open chat
+    alert(`Opening chat...`);
   };
 
   return (
     <View style={styles.container}>
-      {/* HEADER - FREE VERSION BADGE */}
+      {/* HEADER - Tinder/Bumble Style */}
       <View style={styles.header}>
-        <View style={styles.freeBadge}>
-          <Ionicons name="lock-open" size={16} color="#4CAF50" />
-          <Text style={styles.freeBadgeText}>FREE VERSION</Text>
-        </View>
-        <Text style={styles.headerTitle">Who Liked You</Text>
-        <Text style={styles.headerSubtitle}>See all clearly - No blurry premium lock!</Text>
-      </View>
-
-      {/* STATS */}
-      <View style={styles.statsRow}>
-        <View style={styles.statBox}>
-          <Text style={styles.statNumber}>{freeLikes.length}</Text>
-          <Text style={styles.statLabel}>Total Likes</Text>
-        </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statNumber}>{freeLikes.filter(l => l.isNew).length}</Text>
-          <Text style={styles.statLabel}>New Likes</Text>
-        </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statNumber}>0</Text>
-          <Text style={styles.statLabel}>Matches</Text>
+        <Text style={styles.headerTitle}>Likes</Text>
+        <View style={styles.headerStats}>
+          <View style={styles.statPill}>
+            <Ionicons name="flame" size={16} color="#FF6B6B" />
+            <Text style={styles.statPillText}>{likes.length}</Text>
+          </View>
+          <TouchableOpacity style={styles.filterButton}>
+            <Ionicons name="filter" size={22} color={colors.textPrimary} />
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* LIKES LIST - ALL CLEAR! */}
+      {/* MAIN CONTENT - CARD STACK STYLE */}
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {freeLikes.map((user) => (
-          <View key={user.id} style={[styles.likeCard, user.isNew && styles.newLikeCard]}>
-            
-            {/* PROFILE IMAGE - NOT BLURRY! */}
-            <Image source={{ uri: user.image }} style={styles.profileImage} />
-            
-            {/* NEW BADGE */}
-            {user.isNew && (
-              <View style={styles.newBadge}>
-                <Text style={styles.newBadgeText}>NEW</Text>
-              </View>
-            )}
-
-            {/* USER INFO */}
-            <View style={styles.userInfo}>
-              <View style={styles.nameRow}>
-                <Text style={styles.userName}>{user.name}, {user.age}</Text>
-                <Ionicons name="location" size={14} color={colors.textSecondary} />
-                <Text style={styles.distance}>{user.distance}</Text>
-              </View>
+        <Text style={styles.sectionTitle}>People who liked you</Text>
+        
+        {likes.map((person) => (
+          <View 
+            key={person.id} 
+            style={[
+              styles.profileCard,
+              person.isSuperLike && styles.superLikeCard
+            ]}
+          >
+            {/* PROFILE IMAGE WITH BADGES */}
+            <View style={styles.imageContainer}>
+              <Image 
+                source={{ uri: person.image }} 
+                style={styles.profileImage} 
+              />
               
-              <Text style={styles.userBio}>{user.bio}</Text>
+              {/* SUPER LIKE BADGE */}
+              {person.isSuperLike && (
+                <View style={styles.superLikeBadge}>
+                  <Ionicons name="star" size={16} color="#FFD700" />
+                  <Text style={styles.superLikeText}>Super Like</Text>
+                </View>
+              )}
               
-              <View style={styles.likedTimeRow}>
-                <Ionicons name="time" size={14} color={colors.textTertiary} />
-                <Text style={styles.likedTime}>Liked you: {user.likedYouAt}</Text>
+              {/* ONLINE INDICATOR */}
+              {person.isOnline && (
+                <View style={styles.onlineIndicator} />
+              )}
+              
+              {/* TIME BADGE */}
+              <View style={styles.timeBadge}>
+                <Ionicons name="time" size={12} color="white" />
+                <Text style={styles.timeText}>{person.time}</Text>
               </View>
             </View>
 
-            {/* ACTION BUTTONS */}
-            <View style={styles.actionButtons}>
-              <TouchableOpacity 
-                style={styles.passButton}
-                onPress={() => handlePass(user.id)}
-              >
-                <Ionicons name="close-circle" size={28} color="#FF6B6B" />
-                <Text style={styles.passButtonText}>Pass</Text>
-              </TouchableOpacity>
+            {/* PROFILE INFO */}
+            <View style={styles.profileInfo}>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>{person.name}, {person.age}</Text>
+                <Ionicons name="location" size={14} color={colors.textSecondary} />
+                <Text style={styles.distance}>{person.distance}</Text>
+              </View>
               
-              <TouchableOpacity 
-                style={styles.likeButton}
-                onPress={() => handleLikeBack(user.id)}
-              >
-                <Ionicons name="heart-circle" size={28} color="#4CAF50" />
-                <Text style={styles.likeButtonText}>Like Back</Text>
-              </TouchableOpacity>
+              <Text style={styles.bio} numberOfLines={2}>
+                {person.bio}
+              </Text>
+              
+              {/* ACTION BUTTONS - TINDER STYLE */}
+              <View style={styles.actionRow}>
+                <TouchableOpacity 
+                  style={styles.passButton}
+                  onPress={() => handlePass(person.id)}
+                >
+                  <View style={[styles.iconCircle, styles.passCircle]}>
+                    <Ionicons name="close" size={28} color="#FF6B6B" />
+                  </View>
+                  <Text style={styles.passText}>Pass</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.messageButton}
+                  onPress={() => handleMessage(person.id)}
+                >
+                  <View style={[styles.iconCircle, styles.messageCircle]}>
+                    <Ionicons name="chatbubble" size={22} color={colors.textPrimary} />
+                  </View>
+                  <Text style={styles.messageText}>Message</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.likeButton}
+                  onPress={() => handleLike(person.id)}
+                >
+                  <View style={[styles.iconCircle, styles.likeCircle]}>
+                    <Ionicons name="heart" size={24} color="#4CAF50" />
+                  </View>
+                  <Text style={styles.likeText}>Like Back</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         ))}
 
-        {/* FREE FEATURE EXPLANATION */}
-        <View style={styles.freeInfoCard}>
-          <Ionicons name="star" size={24} color="#FFD700" />
-          <Text style={styles.freeInfoTitle}>100% Free Forever</Text>
-          <Text style={styles.freeInfoText}>
-            Unlike other apps, we don't blur your likes. See everyone clearly and match for free!
-          </Text>
+        {/* PREMIUM UPSELL (but still free) */}
+        <View style={styles.premiumCard}>
+          <Ionicons name="diamond" size={30} color="#FFD700" />
+          <View style={styles.premiumContent}>
+            <Text style={styles.premiumTitle}>See Who Likes You - Free!</Text>
+            <Text style={styles.premiumText}>
+              Unlike other apps, we show all likes clearly without paying. 
+              No blurry faces, no hidden profiles.
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -153,180 +190,220 @@ export default function LikesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: "#F8F8F8",
   },
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 15,
-    backgroundColor: colors.primary + "15",
+    backgroundColor: "white",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E8E8E8",
   },
-  freeBadge: {
+  headerTitle: {
+    fontSize: 32,
+    fontFamily: "Manrope-ExtraBold",
+    color: "#FF6B6B", // Tinder red
+  },
+  headerStats: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#4CAF50" + "20",
-    alignSelf: "flex-start",
+  },
+  statPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF0F0",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
-    marginBottom: 10,
+    marginRight: 10,
   },
-  freeBadgeText: {
-    color: "#4CAF50",
+  statPillText: {
+    fontSize: 14,
+    fontFamily: "Manrope-Bold",
+    color: "#FF6B6B",
+    marginLeft: 5,
+  },
+  filterButton: {
+    padding: 8,
+  },
+  scrollView: {
+    flex: 1,
+    paddingHorizontal: 15,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontFamily: "Manrope-SemiBold",
+    color: "#666",
+    marginTop: 20,
+    marginBottom: 15,
+  },
+  profileCard: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+    overflow: "hidden",
+  },
+  superLikeCard: {
+    borderWidth: 2,
+    borderColor: "#FFD700",
+  },
+  imageContainer: {
+    position: "relative",
+  },
+  profileImage: {
+    width: "100%",
+    height: width * 0.7, // Responsive height
+  },
+  superLikeBadge: {
+    position: "absolute",
+    top: 15,
+    left: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 215, 0, 0.9)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+  },
+  superLikeText: {
+    color: "black",
     fontSize: 12,
     fontFamily: "Manrope-Bold",
     marginLeft: 5,
   },
-  headerTitle: {
-    fontSize: 28,
-    fontFamily: "Manrope-Bold",
-    color: colors.textPrimary,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 5,
-    fontFamily: "Manrope",
-  },
-  statsRow: {
-    flexDirection: "row",
-    paddingHorizontal: 20,
-    marginTop: 15,
-    justifyContent: "space-between",
-  },
-  statBox: {
-    alignItems: "center",
-    backgroundColor: colors.card,
-    padding: 15,
-    borderRadius: 15,
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  statNumber: {
-    fontSize: 24,
-    fontFamily: "Manrope-Bold",
-    color: colors.primary,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 5,
-  },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: 20,
-    marginTop: 15,
-  },
-  likeCard: {
-    backgroundColor: colors.card,
-    borderRadius: 20,
-    padding: 15,
-    marginBottom: 15,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  newLikeCard: {
-    borderWidth: 2,
-    borderColor: colors.primary + "50",
-  },
-  profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 3,
-    borderColor: colors.primary,
-  },
-  newBadge: {
+  onlineIndicator: {
     position: "absolute",
-    top: 10,
-    left: 10,
-    backgroundColor: colors.primary,
+    bottom: 15,
+    right: 15,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#4CAF50",
+    borderWidth: 2,
+    borderColor: "white",
+  },
+  timeBadge: {
+    position: "absolute",
+    bottom: 15,
+    left: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
     paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
   },
-  newBadgeText: {
+  timeText: {
     color: "white",
-    fontSize: 10,
-    fontFamily: "Manrope-Bold",
+    fontSize: 11,
+    fontFamily: "Manrope",
+    marginLeft: 4,
   },
-  userInfo: {
-    flex: 1,
-    marginLeft: 15,
+  profileInfo: {
+    padding: 20,
   },
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 8,
   },
-  userName: {
-    fontSize: 18,
+  name: {
+    fontSize: 24,
     fontFamily: "Manrope-Bold",
-    color: colors.textPrimary,
+    color: "#333",
     marginRight: 8,
   },
   distance: {
-    fontSize: 12,
-    color: colors.textSecondary,
+    fontSize: 14,
+    color: "#666",
     marginLeft: 4,
   },
-  userBio: {
-    fontSize: 14,
-    color: colors.textPrimary,
-    marginTop: 5,
+  bio: {
+    fontSize: 16,
+    color: "#555",
+    lineHeight: 22,
+    marginBottom: 20,
     fontFamily: "Manrope",
   },
-  likedTimeRow: {
+  actionRow: {
     flexDirection: "row",
-    alignItems: "center",
-    marginTop: 8,
-  },
-  likedTime: {
-    fontSize: 12,
-    color: colors.textTertiary,
-    marginLeft: 5,
-  },
-  actionButtons: {
-    flexDirection: "row",
-    marginTop: 10,
     justifyContent: "space-between",
+    alignItems: "center",
+  },
+  iconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  passCircle: {
+    backgroundColor: "#FFF0F0",
+  },
+  messageCircle: {
+    backgroundColor: "#F0F0F0",
+  },
+  likeCircle: {
+    backgroundColor: "#F0FFF0",
   },
   passButton: {
     alignItems: "center",
-    marginRight: 15,
   },
-  passButtonText: {
-    fontSize: 12,
-    color: "#FF6B6B",
-    marginTop: 3,
+  messageButton: {
+    alignItems: "center",
   },
   likeButton: {
     alignItems: "center",
   },
-  likeButtonText: {
+  passText: {
     fontSize: 12,
-    color: "#4CAF50",
-    marginTop: 3,
+    color: "#FF6B6B",
     fontFamily: "Manrope-SemiBold",
   },
-  freeInfoCard: {
-    backgroundColor: colors.primary + "10",
-    padding: 20,
+  messageText: {
+    fontSize: 12,
+    color: "#666",
+    fontFamily: "Manrope-SemiBold",
+  },
+  likeText: {
+    fontSize: 12,
+    color: "#4CAF50",
+    fontFamily: "Manrope-SemiBold",
+  },
+  premiumCard: {
+    flexDirection: "row",
+    backgroundColor: "white",
     borderRadius: 20,
-    alignItems: "center",
+    padding: 20,
     marginBottom: 30,
     marginTop: 10,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#FFD700",
   },
-  freeInfoTitle: {
+  premiumContent: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  premiumTitle: {
     fontSize: 18,
     fontFamily: "Manrope-Bold",
-    color: colors.textPrimary,
-    marginTop: 10,
+    color: "#333",
+    marginBottom: 5,
   },
-  freeInfoText: {
+  premiumText: {
     fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: "center",
-    marginTop: 8,
+    color: "#666",
     lineHeight: 20,
   },
 });
