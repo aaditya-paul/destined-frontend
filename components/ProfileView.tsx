@@ -6,8 +6,9 @@ import InterestChip from "@/components/ui/InterestChip";
 import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
 import { OnboardingData } from "@/context/types";
 import { Ionicons } from "@expo/vector-icons";
+import { Audio } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -19,25 +20,151 @@ import {
 
 const { width, height } = Dimensions.get("window");
 
-const VoicePrompt = ({ duration }: { duration: string | null }) => (
-  <View style={styles.cardPadding}>
-    <View style={styles.rowBetween}>
-      <Text style={styles.cardLabel}>HEAR ME OUT</Text>
-      <Ionicons name="mic" size={12} color={colors.primary} />
-    </View>
-    <View style={styles.voicePlayer}>
-      <TouchableOpacity style={styles.playCircle}>
-        <Ionicons name="play" size={18} color={colors.white} />
-      </TouchableOpacity>
-      <View style={styles.waveFormContainer}>
-        {[1, 0.6, 0.8, 0.4, 0.9, 0.5, 1, 0.7].map((h, i) => (
-          <View key={i} style={[styles.waveBar, { height: h * 20 }]} />
-        ))}
+const VoicePrompt = ({
+  duration,
+  uri,
+}: {
+  duration: string | null;
+  uri?: string | null;
+}) => {
+  const [sound, setSound] = useState<Audio.Sound>();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0); // 0 to 1
+  const [currentPosition, setCurrentPosition] = useState(0); // in ms
+
+  // Format MM:SS
+  const formatTime = (millis: number) => {
+    const minutes = Math.floor(millis / 60000);
+    const seconds = ((millis % 60000) / 1000).toFixed(0);
+    return `${minutes}:${Number(seconds) < 10 ? "0" : ""}${seconds}`;
+  };
+
+  async function playSound() {
+    if (!uri) return;
+    try {
+      if (sound) {
+        if (isPlaying) {
+          await sound.pauseAsync();
+          setIsPlaying(false);
+        } else {
+          await sound.playAsync();
+          setIsPlaying(true);
+        }
+      } else {
+        const { sound: newSound } = await Audio.Sound.createAsync(
+          { uri },
+          {
+            shouldPlay: true,
+            isLooping: false,
+            progressUpdateIntervalMillis: 50,
+          }, // fast updates
+        );
+        setSound(newSound);
+        setIsPlaying(true);
+        newSound.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded) {
+            // Update progress & position
+            if (status.durationMillis) {
+              setProgress(status.positionMillis / status.durationMillis);
+              setCurrentPosition(status.positionMillis);
+            }
+
+            if (status.didJustFinish) {
+              setIsPlaying(false);
+              setProgress(0);
+              setCurrentPosition(0);
+              newSound.stopAsync(); // Ensure it stops
+              newSound.setPositionAsync(0);
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.log("Error playing sound", error);
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      sound ? sound.unloadAsync() : undefined;
+    };
+  }, [sound]);
+
+  // Generate some static random heights for the bars
+  const waveHeights = [
+    0.4, 0.7, 0.5, 0.9, 0.6, 0.8, 1, 0.7, 0.5, 0.8, 0.6, 0.9, 0.4, 0.6, 0.5,
+    0.8, 0.5, 0.7, 0.4, 0.6,
+  ];
+
+  return (
+    <View style={styles.cardPadding}>
+      <View style={styles.rowBetween}>
+        <Text style={styles.cardLabel}>HEAR ME OUT</Text>
+        <View style={styles.audioBadge}>
+          <Ionicons name="headset" size={10} color={colors.white} />
+          <Text style={styles.audioBadgeText}>AUDIO</Text>
+        </View>
       </View>
-      <Text style={styles.voiceDuration}>{duration || "0:00"}</Text>
+
+      <View style={styles.voicePlayerContainer}>
+        <TouchableOpacity
+          style={[styles.playCircle, isPlaying && styles.playCircleActive]}
+          onPress={playSound}
+          activeOpacity={0.8}
+        >
+          <Ionicons
+            name={isPlaying ? "pause" : "play"}
+            size={22}
+            color={isPlaying ? colors.white : colors.primary}
+            style={{ marginLeft: isPlaying ? 0 : 2 }} // center play icon visually
+          />
+        </TouchableOpacity>
+
+        <View style={styles.trackContainer}>
+          <View style={styles.waveFormContainer}>
+            {waveHeights.map((h, i) => {
+              // Smoother visualization
+              // Calculate how much of this specific bar is filled
+              // Total bars = 20. Each bar represents 5% (0.05) of total duration.
+              const barWidth = 1 / waveHeights.length;
+              const barStart = i * barWidth;
+
+              // If progress is past this bar's end, it's fully active (1)
+              // If progress is before this bar's start, it's inactive (0)
+              // If progress is within this bar, it's partially active
+
+              let activeOpacity = 0.3; // Default inactive
+              let barColor = "#E0E0E0";
+
+              if (progress > barStart) {
+                barColor = colors.primary;
+                activeOpacity = 1;
+              }
+
+              return (
+                <View
+                  key={i}
+                  style={[
+                    styles.waveBar,
+                    {
+                      height: 12 + h * 18,
+                      backgroundColor: barColor,
+                      opacity: activeOpacity,
+                    },
+                  ]}
+                />
+              );
+            })}
+          </View>
+        </View>
+
+        <Text style={styles.voiceDuration}>
+          {isPlaying ? formatTime(currentPosition) : duration || "0:00"}
+        </Text>
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const PollSection = ({
   question,
@@ -177,10 +304,18 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         {profile.voiceNoteDuration && (
           <LikeableCard
             onLike={() =>
-              onCardLike?.(<VoicePrompt duration={profile.voiceNoteDuration} />)
+              onCardLike?.(
+                <VoicePrompt
+                  duration={profile.voiceNoteDuration}
+                  uri={profile.voiceNoteUri}
+                />,
+              )
             }
           >
-            <VoicePrompt duration={profile.voiceNoteDuration} />
+            <VoicePrompt
+              duration={profile.voiceNoteDuration}
+              uri={profile.voiceNoteUri}
+            />
           </LikeableCard>
         )}
 
@@ -439,36 +574,72 @@ const styles = StyleSheet.create({
   },
 
   // Voice Player
-  voicePlayer: {
+  // Voice Player
+  voicePlayerContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
+    backgroundColor: "#F8F9FA",
+    padding: spacing.sm,
+    borderRadius: 16,
+    marginTop: spacing.xs,
   },
   playCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.primary,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.white,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#F0F0F0",
+  },
+  playCircleActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  trackContainer: {
+    flex: 1,
+    height: 40,
+    justifyContent: "center",
   },
   waveFormContainer: {
-    flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    justifyContent: "space-between",
+    gap: 2,
     height: 30,
   },
   waveBar: {
-    flex: 1,
-    backgroundColor: colors.primary,
+    width: 3,
     borderRadius: 2,
-    opacity: 0.3,
   },
   voiceDuration: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: fontFamilies.bold,
     color: colors.textSecondary,
+    width: 40,
+    textAlign: "right",
+  },
+  audioBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: colors.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  audioBadgeText: {
+    color: colors.white,
+    fontSize: 8,
+    fontFamily: fontFamilies.bold,
+    letterSpacing: 1,
   },
 
   // Poll

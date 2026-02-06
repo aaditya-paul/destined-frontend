@@ -29,7 +29,8 @@ export interface OnboardingData {
   bio: string;
   interests: string[];
   poll: PollData;
-  voiceNoteDuration: string | null; // For now just a duration string to simulate presence
+  voiceNoteDuration: string | null; // For layout purposes
+  voiceNoteUri?: string | null; // Actual file path
 
   // Visuals
   images: (ImageItem | undefined)[];

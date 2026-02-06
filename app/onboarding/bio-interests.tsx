@@ -9,8 +9,9 @@ import TextInput from "@/components/ui/TextInput";
 import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
 import { useOnboarding } from "@/context/OnboardingContext";
 import { Ionicons } from "@expo/vector-icons";
+import { Audio } from "expo-av";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -25,6 +26,56 @@ const BioInterestsScreen = () => {
   const router = useRouter();
   const { data, updateData } = useOnboarding();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [recording, setRecording] = useState<Audio.Recording | undefined>();
+  const [permissionResponse, requestPermission] = Audio.usePermissions();
+  const [recordingDuration, setRecordingDuration] = useState(0); // in seconds
+  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(
+    null,
+  );
+
+  // Playback State
+  const [sound, setSound] = useState<Audio.Sound | undefined>();
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, [sound]);
+
+  async function playRecordedAudio() {
+    if (!data.voiceNoteUri) return;
+    try {
+      if (sound) {
+        if (isPlaying) {
+          await sound.pauseAsync();
+          setIsPlaying(false);
+        } else {
+          await sound.playAsync();
+          setIsPlaying(true);
+        }
+      } else {
+        console.log("Loading Sound");
+        const { sound: newSound } = await Audio.Sound.createAsync(
+          { uri: data.voiceNoteUri },
+          { shouldPlay: true, isLooping: false },
+        );
+        setSound(newSound);
+        setIsPlaying(true);
+        newSound.setOnPlaybackStatusUpdate((status) => {
+          if (status.isLoaded && status.didJustFinish) {
+            setIsPlaying(false);
+            newSound.stopAsync();
+            newSound.setPositionAsync(0);
+          }
+        });
+      }
+    } catch (error) {
+      console.log("Error playing audio", error);
+    }
+  }
 
   // Local state for Poll editing (simplified for now)
   const [pollQuestion, setPollQuestion] = useState(data.poll.question);
@@ -156,48 +207,134 @@ const BioInterestsScreen = () => {
             </View>
           </View>
 
-          {/* Voice Prompt (Mock Recording) */}
+          {/* Voice Prompt (Real Recording) */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>AUDIO LOG</Text>
             <LikeableCard hideLikeBtn={true}>
               <View style={styles.voiceCardContent}>
                 <View style={styles.voiceHeader}>
-                  <Text style={styles.voiceLabel}>RECORD 15 SEC INTRO</Text>
-                  {data.voiceNoteDuration ? (
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={16}
-                      color={colors.primary}
-                    />
-                  ) : (
-                    <Ionicons
-                      name="mic-outline"
-                      size={16}
-                      color={colors.textSecondary}
-                    />
-                  )}
+                  <Text style={styles.voiceLabel}>
+                    {recording ? "RECORDING..." : "RECORD 2 MIN INTRO"}
+                  </Text>
+                  {data.voiceNoteUri ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        updateData({
+                          voiceNoteDuration: null,
+                          voiceNoteUri: null,
+                        });
+                        setRecordingDuration(0);
+                        if (sound) {
+                          sound.unloadAsync();
+                          setSound(undefined);
+                          setIsPlaying(false);
+                        }
+                      }}
+                    >
+                      <Ionicons
+                        name="trash-outline"
+                        size={18}
+                        color={colors.primary}
+                      />
+                    </TouchableOpacity>
+                  ) : null}
                 </View>
 
                 <TouchableOpacity
                   style={[
                     styles.recordButton,
-                    data.voiceNoteDuration ? styles.recordButtonActive : {},
+                    recording ? styles.recordButtonRecording : {},
+                    data.voiceNoteUri ? styles.recordButtonActive : {},
                   ]}
-                  onPress={() =>
-                    updateData({
-                      voiceNoteDuration: data.voiceNoteDuration ? null : "0:15",
-                    })
-                  }
+                  onPress={async () => {
+                    if (recording) {
+                      // Stop Recording
+                      console.log("Stopping recording..");
+                      if (timerInterval) clearInterval(timerInterval);
+                      setTimerInterval(null);
+                      setRecording(undefined);
+                      await recording.stopAndUnloadAsync();
+                      const uri = recording.getURI();
+                      console.log("Recording stopped and stored at", uri);
+
+                      // Format duration
+                      const mins = Math.floor(recordingDuration / 60);
+                      const secs = recordingDuration % 60;
+                      const durationStr = `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+
+                      updateData({
+                        voiceNoteUri: uri,
+                        voiceNoteDuration: durationStr,
+                      });
+                    } else if (data.voiceNoteUri) {
+                      // Playback
+                      playRecordedAudio();
+                    } else {
+                      // Start Recording
+                      if (permissionResponse?.status !== "granted") {
+                        console.log("Requesting permission..");
+                        const permission = await requestPermission();
+                        if (permission.status !== "granted") return;
+                      }
+
+                      await Audio.setAudioModeAsync({
+                        allowsRecordingIOS: true,
+                        playsInSilentModeIOS: true,
+                      });
+
+                      console.log("Starting recording..");
+                      const { recording } = await Audio.Recording.createAsync(
+                        Audio.RecordingOptionsPresets.HIGH_QUALITY,
+                      );
+                      setRecording(recording);
+                      setRecordingDuration(0);
+
+                      const interval = setInterval(() => {
+                        setRecordingDuration((d) => {
+                          if (d >= 120) {
+                            // 2 mins limit
+                            // Stop automatically
+                            recording.stopAndUnloadAsync().then(() => {
+                              const uri = recording.getURI();
+                              updateData({
+                                voiceNoteUri: uri,
+                                voiceNoteDuration: "2:00",
+                              });
+                              setRecording(undefined);
+                              clearInterval(interval);
+                            });
+                            return 120;
+                          }
+                          return d + 1;
+                        });
+                      }, 1000);
+                      setTimerInterval(interval as unknown as NodeJS.Timeout);
+                    }
+                  }}
                 >
-                  <Ionicons
-                    name={data.voiceNoteDuration ? "stop" : "mic"}
-                    size={24}
-                    color={colors.white}
-                  />
+                  {recording ? (
+                    <View style={styles.recordingIndicator} />
+                  ) : (
+                    <Ionicons
+                      name={
+                        data.voiceNoteUri
+                          ? isPlaying
+                            ? "pause"
+                            : "play"
+                          : "mic"
+                      }
+                      size={24}
+                      color={colors.white}
+                    />
+                  )}
                 </TouchableOpacity>
 
                 <Text style={styles.voiceHint}>
-                  {data.voiceNoteDuration ? "AUDIO CAPTURED" : "TAP TO RECORD"}
+                  {recording
+                    ? `${Math.floor(recordingDuration / 60)}:${(recordingDuration % 60).toString().padStart(2, "0")} / 2:00`
+                    : data.voiceNoteDuration
+                      ? `AUDIO CAPTURED (${data.voiceNoteDuration})`
+                      : "TAP TO RECORD"}
                 </Text>
               </View>
             </LikeableCard>
@@ -347,6 +484,17 @@ const styles = StyleSheet.create({
   },
   recordButtonActive: {
     backgroundColor: colors.primary,
+  },
+  recordButtonRecording: {
+    backgroundColor: "#FF4B4B",
+    borderWidth: 2,
+    borderColor: colors.white,
+  },
+  recordingIndicator: {
+    width: 24,
+    height: 24,
+    backgroundColor: colors.white,
+    borderRadius: 4,
   },
   voiceHint: {
     fontSize: 10,
