@@ -34,6 +34,8 @@ const VoicePrompt = ({
   const [totalDuration, setTotalDuration] = useState(0); // in ms
   const [layoutWidth, setLayoutWidth] = useState(0);
 
+  const [isSeeking, setIsSeeking] = useState(false); // Add seeking state
+
   // Format MM:SS
   const formatTime = (millis: number) => {
     const minutes = Math.floor(millis / 60000);
@@ -65,11 +67,13 @@ const VoicePrompt = ({
         setIsPlaying(true);
         newSound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded) {
-            // Update progress & position
+            // Update progress & position ONLY if not seeking
             if (status.durationMillis) {
               setTotalDuration(status.durationMillis);
-              setProgress(status.positionMillis / status.durationMillis);
-              setCurrentPosition(status.positionMillis);
+              if (!isSeeking) {
+                setProgress(status.positionMillis / status.durationMillis);
+                setCurrentPosition(status.positionMillis);
+              }
             }
 
             if (status.didJustFinish) {
@@ -90,22 +94,39 @@ const VoicePrompt = ({
   const handleSeek = async (event: any) => {
     if (!sound || !totalDuration || !layoutWidth) return;
 
+    setIsSeeking(true); // Block updates
+
     const touchX = event.nativeEvent.locationX;
-    const seekProgress = touchX / layoutWidth;
+    // Bound between 0 and 1
+    const seekProgress = Math.max(0, Math.min(1, touchX / layoutWidth));
     const seekPosition = seekProgress * totalDuration;
 
-    // Optistically update UI
+    // Optimally update UI immediately
     setProgress(seekProgress);
     setCurrentPosition(seekPosition);
 
     try {
-      await sound.setPositionAsync(seekPosition);
-      if (!isPlaying) {
-        await sound.playAsync();
-        setIsPlaying(true);
+      // Pause first for smoother seek
+      if (isPlaying) {
+        await sound.pauseAsync();
       }
+
+      await sound.setPositionAsync(seekPosition);
+
+      // Resume if it was playing or we want it to play on tap
+      // Let's decide: tap to seek always plays? Or maintains state?
+      // User said "voice control", usually seek keeps playing.
+      // But if paused, maybe just seek?
+      // Let's force play for better feedback
+      await sound.playAsync();
+      setIsPlaying(true);
     } catch (error) {
       console.log("Error seeking", error);
+    } finally {
+      // Small delay to let the seek settle before allowing updates again
+      setTimeout(() => {
+        setIsSeeking(false);
+      }, 100);
     }
   };
 
