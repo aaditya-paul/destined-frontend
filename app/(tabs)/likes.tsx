@@ -1,6 +1,13 @@
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from "react-native";
-import { colors } from "@constants/globalStyles";
+import { colors } from "@/constants/globalStyles";
 import { Ionicons } from "@expo/vector-icons";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function LikesScreen() {
   // FREE VERSION - No blurry images!
@@ -65,8 +72,10 @@ export default function LikesScreen() {
           <Ionicons name="lock-open" size={16} color="#4CAF50" />
           <Text style={styles.freeBadgeText}>FREE VERSION</Text>
         </View>
-        <Text style={styles.headerTitle">Who Liked You</Text>
-        <Text style={styles.headerSubtitle}>See all clearly - No blurry premium lock!</Text>
+        <Text style={styles.headerTitle}>Who Liked You</Text>
+        <Text style={styles.headerSubtitle}>
+          See all clearly - No blurry premium lock!
+        </Text>
       </View>
 
       {/* STATS */}
@@ -76,7 +85,9 @@ export default function LikesScreen() {
           <Text style={styles.statLabel}>Total Likes</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={styles.statNumber}>{freeLikes.filter(l => l.isNew).length}</Text>
+          <Text style={styles.statNumber}>
+            {freeLikes.filter((l) => l.isNew).length}
+          </Text>
           <Text style={styles.statLabel}>New Likes</Text>
         </View>
         <View style={styles.statBox}>
@@ -86,13 +97,18 @@ export default function LikesScreen() {
       </View>
 
       {/* LIKES LIST - ALL CLEAR! */}
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {freeLikes.map((user) => (
-          <View key={user.id} style={[styles.likeCard, user.isNew && styles.newLikeCard]}>
-            
+          <View
+            key={user.id}
+            style={[styles.likeCard, user.isNew && styles.newLikeCard]}
+          >
             {/* PROFILE IMAGE - NOT BLURRY! */}
             <Image source={{ uri: user.image }} style={styles.profileImage} />
-            
+
             {/* NEW BADGE */}
             {user.isNew && (
               <View style={styles.newBadge}>
@@ -103,30 +119,38 @@ export default function LikesScreen() {
             {/* USER INFO */}
             <View style={styles.userInfo}>
               <View style={styles.nameRow}>
-                <Text style={styles.userName}>{user.name}, {user.age}</Text>
-                <Ionicons name="location" size={14} color={colors.textSecondary} />
+                <Text style={styles.userName}>
+                  {user.name}, {user.age}
+                </Text>
+                <Ionicons
+                  name="location"
+                  size={14}
+                  color={colors.textSecondary}
+                />
                 <Text style={styles.distance}>{user.distance}</Text>
               </View>
-              
+
               <Text style={styles.userBio}>{user.bio}</Text>
-              
+
               <View style={styles.likedTimeRow}>
                 <Ionicons name="time" size={14} color={colors.textTertiary} />
-                <Text style={styles.likedTime}>Liked you: {user.likedYouAt}</Text>
+                <Text style={styles.likedTime}>
+                  Liked you: {user.likedYouAt}
+                </Text>
               </View>
             </View>
 
             {/* ACTION BUTTONS */}
             <View style={styles.actionButtons}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.passButton}
                 onPress={() => handlePass(user.id)}
               >
                 <Ionicons name="close-circle" size={28} color="#FF6B6B" />
                 <Text style={styles.passButtonText}>Pass</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 style={styles.likeButton}
                 onPress={() => handleLikeBack(user.id)}
               >
@@ -142,7 +166,8 @@ export default function LikesScreen() {
           <Ionicons name="star" size={24} color="#FFD700" />
           <Text style={styles.freeInfoTitle}>100% Free Forever</Text>
           <Text style={styles.freeInfoText}>
-            Unlike other apps, we don't blur your likes. See everyone clearly and match for free!
+            Unlike other apps, we don't blur your likes. See everyone clearly
+            and match for free!
           </Text>
         </View>
       </ScrollView>
