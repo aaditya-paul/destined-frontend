@@ -31,6 +31,8 @@ const VoicePrompt = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0); // 0 to 1
   const [currentPosition, setCurrentPosition] = useState(0); // in ms
+  const [totalDuration, setTotalDuration] = useState(0); // in ms
+  const [layoutWidth, setLayoutWidth] = useState(0);
 
   // Format MM:SS
   const formatTime = (millis: number) => {
@@ -65,6 +67,7 @@ const VoicePrompt = ({
           if (status.isLoaded) {
             // Update progress & position
             if (status.durationMillis) {
+              setTotalDuration(status.durationMillis);
               setProgress(status.positionMillis / status.durationMillis);
               setCurrentPosition(status.positionMillis);
             }
@@ -83,6 +86,28 @@ const VoicePrompt = ({
       console.log("Error playing sound", error);
     }
   }
+
+  const handleSeek = async (event: any) => {
+    if (!sound || !totalDuration || !layoutWidth) return;
+
+    const touchX = event.nativeEvent.locationX;
+    const seekProgress = touchX / layoutWidth;
+    const seekPosition = seekProgress * totalDuration;
+
+    // Optistically update UI
+    setProgress(seekProgress);
+    setCurrentPosition(seekPosition);
+
+    try {
+      await sound.setPositionAsync(seekPosition);
+      if (!isPlaying) {
+        await sound.playAsync();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.log("Error seeking", error);
+    }
+  };
 
   useEffect(() => {
     return () => {
@@ -120,7 +145,12 @@ const VoicePrompt = ({
           />
         </TouchableOpacity>
 
-        <View style={styles.trackContainer}>
+        <TouchableOpacity
+          style={styles.trackContainer}
+          onLayout={(e) => setLayoutWidth(e.nativeEvent.layout.width)}
+          onPress={handleSeek}
+          activeOpacity={1}
+        >
           <View style={styles.waveFormContainer}>
             {waveHeights.map((h, i) => {
               // Smoother visualization
@@ -156,7 +186,7 @@ const VoicePrompt = ({
               );
             })}
           </View>
-        </View>
+        </TouchableOpacity>
 
         <Text style={styles.voiceDuration}>
           {isPlaying ? formatTime(currentPosition) : duration || "0:00"}

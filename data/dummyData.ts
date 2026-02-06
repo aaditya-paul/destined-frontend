@@ -23,6 +23,8 @@ export const dummyProfiles: OnboardingData[] = [
       ],
     },
     voiceNoteDuration: "0:42",
+    voiceNoteUri:
+      "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", // Test audio
     images: [
       {
         uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop",
