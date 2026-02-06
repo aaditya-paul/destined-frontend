@@ -12,6 +12,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -24,6 +25,7 @@ interface ComplimentModalProps {
   onClose: () => void;
   onSend: (message: string) => void;
   profileName: string;
+  cardContext?: React.ReactNode;
 }
 
 const ComplimentModal = ({
@@ -31,6 +33,7 @@ const ComplimentModal = ({
   onClose,
   onSend,
   profileName,
+  cardContext,
 }: ComplimentModalProps) => {
   const [message, setMessage] = useState("");
   const maxLength = 300;
@@ -72,81 +75,98 @@ const ComplimentModal = ({
               <Ionicons name="close" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
-          <View>
-            <Text style={styles.subtitle}>
-              Stand out with a thoughtful first message to
+          <ScrollView>
+            <View>
+              <Text style={styles.subtitle}>
+                Stand out with a thoughtful first message to
+                <Text
+                  style={[
+                    styles.subtitle,
+                    {
+                      color: colors.primary,
+                      fontFamily: fontFamilies.variable,
+                      fontWeight: "700",
+                    },
+                  ]}
+                >
+                  {" "}
+                  {profileName}
+                </Text>
+                .
+              </Text>
+            </View>
+
+            {/* Card Context Preview */}
+            {cardContext && (
+              <View style={styles.cardContextContainer}>
+                <View style={styles.cardContextHeader}>
+                  <Ionicons
+                    name="arrow-undo"
+                    size={14}
+                    color={colors.textSecondary}
+                  />
+                  <Text style={styles.cardContextLabel}>Replying to</Text>
+                </View>
+                <View style={styles.cardContextPreview}>{cardContext}</View>
+              </View>
+            )}
+
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Write your message here..."
+                placeholderTextColor={colors.textSecondary}
+                value={message}
+                onChangeText={setMessage}
+                multiline
+                maxLength={maxLength}
+                autoFocus
+                textAlignVertical="top"
+              />
+              <View style={styles.characterCount}>
+                <Text style={styles.characterCountText}>
+                  {message.length}/{maxLength}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.suggestionsContainer}>
+              <Text style={styles.suggestionsTitle}>Quick starters:</Text>
+              <View style={styles.suggestionChips}>
+                {[
+                  "Love your taste in...",
+                  "Your bio made me smile",
+                  "We should talk about...",
+                ].map((suggestion, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.suggestionChip}
+                    onPress={() => setMessage(suggestion)}
+                  >
+                    <Text style={styles.suggestionText}>{suggestion}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={[
+                styles.sendButton,
+                !message.trim() && styles.sendButtonDisabled,
+              ]}
+              onPress={handleSend}
+              disabled={!message.trim()}
+            >
               <Text
                 style={[
-                  styles.subtitle,
-                  {
-                    color: colors.primary,
-                    fontFamily: fontFamilies.variable,
-                    fontWeight: "700",
-                  },
+                  styles.sendButtonText,
+                  !message.trim() && styles.sendButtonTextDisabled,
                 ]}
               >
-                {" "}
-                {profileName}
+                Send Like
               </Text>
-              .
-            </Text>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Write your message here..."
-              placeholderTextColor={colors.textSecondary}
-              value={message}
-              onChangeText={setMessage}
-              multiline
-              maxLength={maxLength}
-              autoFocus
-              textAlignVertical="top"
-            />
-            <View style={styles.characterCount}>
-              <Text style={styles.characterCountText}>
-                {message.length}/{maxLength}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.suggestionsContainer}>
-            <Text style={styles.suggestionsTitle}>Quick starters:</Text>
-            <View style={styles.suggestionChips}>
-              {[
-                "Love your taste in...",
-                "Your bio made me smile",
-                "We should talk about...",
-              ].map((suggestion, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.suggestionChip}
-                  onPress={() => setMessage(suggestion)}
-                >
-                  <Text style={styles.suggestionText}>{suggestion}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          <TouchableOpacity
-            style={[
-              styles.sendButton,
-              !message.trim() && styles.sendButtonDisabled,
-            ]}
-            onPress={handleSend}
-            disabled={!message.trim()}
-          >
-            <Text
-              style={[
-                styles.sendButtonText,
-                !message.trim() && styles.sendButtonTextDisabled,
-              ]}
-            >
-              Send Like
-            </Text>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -159,7 +179,7 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.45)",
+    // backgroundColor: "rgba(0,0,0,0.45)",
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -228,6 +248,32 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.sm,
     fontFamily: fontFamilies.primary.regular,
     color: colors.textSecondary,
+  },
+  cardContextContainer: {
+    marginTop: spacing.md,
+    marginBottom: spacing.md,
+  },
+  cardContextHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    marginBottom: spacing.xs,
+  },
+  cardContextLabel: {
+    fontSize: fontSizes.xs,
+    fontFamily: fontFamilies.primary.medium,
+    color: colors.textSecondary,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  cardContextPreview: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: "hidden",
+    opacity: 0.85,
+    transform: [{ scale: 0.92 }],
   },
   suggestionsContainer: {
     marginBottom: spacing.lg,

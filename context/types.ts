@@ -5,6 +5,12 @@ export interface PollData {
 
 export type Gender = "Man" | "Woman" | "Non-binary" | "Prefer not to say" | "";
 export type LookingFor = "Men" | "Women" | "Everyone" | "";
+export type DatingPreference =
+  | "Long-term relationship"
+  | "Short-term fun"
+  | "Figuring it out"
+  | "New friends"
+  | "";
 
 export interface OnboardingData {
   // Basic Identity
@@ -13,6 +19,7 @@ export interface OnboardingData {
   dateOfBirth: Date;
   gender: Gender;
   lookingFor: LookingFor;
+  datingPreference: DatingPreference;
   location: string;
   height: string;
   jobTitle: string;

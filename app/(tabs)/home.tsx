@@ -5,11 +5,11 @@ import { colors, generalSizes } from "@/constants/globalStyles";
 import { dummyProfiles } from "@/data/dummyData";
 import React, { useRef, useState } from "react";
 import {
-  Animated,
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  View,
+    Animated,
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    View,
 } from "react-native";
 
 const { width } = Dimensions.get("window");
@@ -18,6 +18,7 @@ export default function HomeScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showComplimentModal, setShowComplimentModal] = useState(false);
+  const [selectedCardContext, setSelectedCardContext] = useState<React.ReactNode>(null);
   const currentProfile = dummyProfiles[currentIndex];
   const nextProfile = dummyProfiles[(currentIndex + 1) % dummyProfiles.length];
 
@@ -90,8 +91,14 @@ export default function HomeScreen() {
     setShowComplimentModal(true);
   };
 
+  const handleCardLike = (cardContent: React.ReactNode) => {
+    setSelectedCardContext(cardContent);
+    setShowComplimentModal(true);
+  };
+
   const handleSendCompliment = (message: string) => {
     console.log(`Liked: ${currentProfile.firstName} with message: ${message}`);
+    setSelectedCardContext(null);
     animateSlide("right");
   };
 
@@ -114,7 +121,7 @@ export default function HomeScreen() {
         scrollEnabled={!isNext}
         style={{ backgroundColor: colors.background }}
       >
-        <ProfileView profile={profile} />
+        <ProfileView profile={profile} onCardLike={isNext ? undefined : handleCardLike} />
       </ScrollView>
     );
   };
@@ -172,9 +179,13 @@ export default function HomeScreen() {
       {/* COMPLIMENT MODAL */}
       <ComplimentModal
         visible={showComplimentModal}
-        onClose={() => setShowComplimentModal(false)}
+        onClose={() => {
+          setShowComplimentModal(false);
+          setSelectedCardContext(null);
+        }}
         onSend={handleSendCompliment}
         profileName={currentProfile.firstName}
+        cardContext={selectedCardContext}
       />
     </View>
   );

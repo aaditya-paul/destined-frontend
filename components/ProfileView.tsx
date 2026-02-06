@@ -61,9 +61,13 @@ const PollSection = ({
 
 interface ProfileViewProps {
   profile: OnboardingData;
+  onCardLike?: (cardContent: React.ReactNode) => void;
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ profile }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({
+  profile,
+  onCardLike,
+}) => {
   const age = profile.dateOfBirth
     ? new Date().getFullYear() - profile.dateOfBirth.getFullYear()
     : "";
@@ -121,12 +125,38 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile }) => {
                 <Text style={styles.vitalLabel}>{profile.school}</Text>
               </View>
             ) : null}
+            {profile.datingPreference ? (
+              <View style={styles.vitalChip}>
+                <Ionicons name="heart" size={14} color={colors.secondary} />
+                <Text style={styles.vitalLabel}>
+                  {profile.datingPreference}
+                </Text>
+              </View>
+            ) : null}
           </View>
         </View>
 
         {/* --- SLOT 1: Image 1 --- */}
         {profile.images[1]?.uri && (
-          <LikeableCard>
+          <LikeableCard
+            onLike={() =>
+              onCardLike?.(
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={{ uri: profile.images[1]?.uri }}
+                    style={styles.feedImage}
+                  />
+                  {profile.images[1]?.prompt && (
+                    <View style={styles.tapeTag}>
+                      <Text style={styles.tapeText}>
+                        {`// ${profile.images[1].prompt.toUpperCase()}`}
+                      </Text>
+                    </View>
+                  )}
+                </View>,
+              )
+            }
+          >
             <View style={styles.imageContainer}>
               <Image
                 source={{ uri: profile.images[1]?.uri }}
@@ -145,14 +175,27 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile }) => {
 
         {/* --- SLOT 2: Voice --- */}
         {profile.voiceNoteDuration && (
-          <LikeableCard>
+          <LikeableCard
+            onLike={() =>
+              onCardLike?.(<VoicePrompt duration={profile.voiceNoteDuration} />)
+            }
+          >
             <VoicePrompt duration={profile.voiceNoteDuration} />
           </LikeableCard>
         )}
 
         {/* --- SLOT 3: Bio --- */}
         {profile.bio && (
-          <LikeableCard>
+          <LikeableCard
+            onLike={() =>
+              onCardLike?.(
+                <View style={styles.cardPadding}>
+                  <Text style={styles.cardLabel}>THE PLOT</Text>
+                  <Text style={styles.bioText}>{profile.bio}</Text>
+                </View>,
+              )
+            }
+          >
             <View style={styles.cardPadding}>
               <Text style={styles.cardLabel}>THE PLOT</Text>
               <Text style={styles.bioText}>{profile.bio}</Text>
@@ -162,7 +205,25 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile }) => {
 
         {/* --- SLOT 4: Image 2 --- */}
         {profile.images[2]?.uri && (
-          <LikeableCard>
+          <LikeableCard
+            onLike={() =>
+              onCardLike?.(
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={{ uri: profile.images[2]?.uri }}
+                    style={styles.feedImage}
+                  />
+                  {profile.images[2]?.prompt && (
+                    <View style={styles.tapeTag}>
+                      <Text style={styles.tapeText}>
+                        {`// ${profile.images[2].prompt.toUpperCase()}`}
+                      </Text>
+                    </View>
+                  )}
+                </View>,
+              )
+            }
+          >
             <View style={styles.imageContainer}>
               <Image
                 source={{ uri: profile.images[2]?.uri }}
@@ -180,7 +241,16 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile }) => {
         )}
 
         {/* --- SLOT 5: Poll --- */}
-        <LikeableCard>
+        <LikeableCard
+          onLike={() =>
+            onCardLike?.(
+              <PollSection
+                question={profile.poll.question || "Help me decide?"}
+                options={profile.poll.options}
+              />,
+            )
+          }
+        >
           <PollSection
             question={profile.poll.question || "Help me decide?"}
             options={profile.poll.options}
@@ -189,7 +259,25 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile }) => {
 
         {/* --- SLOT 6: Image 3 --- */}
         {profile.images[3]?.uri && (
-          <LikeableCard>
+          <LikeableCard
+            onLike={() =>
+              onCardLike?.(
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={{ uri: profile.images[3]?.uri }}
+                    style={styles.feedImage}
+                  />
+                  {profile.images[3]?.prompt && (
+                    <View style={styles.tapeTag}>
+                      <Text style={styles.tapeText}>
+                        {`// ${profile.images[3].prompt.toUpperCase()}`}
+                      </Text>
+                    </View>
+                  )}
+                </View>,
+              )
+            }
+          >
             <View style={styles.imageContainer}>
               <Image
                 source={{ uri: profile.images[3]?.uri }}
@@ -227,18 +315,24 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile }) => {
         {/* --- SLOT 8+: Remaining Images (4, 5) --- */}
         {profile.images.slice(4).map((img, index) => {
           if (!img?.uri) return null;
+          const imageContent = (
+            <View style={styles.imageContainer}>
+              <Image source={{ uri: img.uri }} style={styles.feedImage} />
+              {img.prompt && (
+                <View style={styles.tapeTag}>
+                  <Text style={styles.tapeText}>
+                    {`// ${img.prompt.toUpperCase()}`}
+                  </Text>
+                </View>
+              )}
+            </View>
+          );
           return (
-            <LikeableCard key={`remaining-img-${index}`}>
-              <View style={styles.imageContainer}>
-                <Image source={{ uri: img.uri }} style={styles.feedImage} />
-                {img.prompt && (
-                  <View style={styles.tapeTag}>
-                    <Text style={styles.tapeText}>
-                      {`// ${img.prompt.toUpperCase()}`}
-                    </Text>
-                  </View>
-                )}
-              </View>
+            <LikeableCard
+              key={`remaining-img-${index}`}
+              onLike={() => onCardLike?.(imageContent)}
+            >
+              {imageContent}
             </LikeableCard>
           );
         })}

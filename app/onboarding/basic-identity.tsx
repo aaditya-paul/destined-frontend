@@ -40,6 +40,12 @@ const BasicIdentityScreen = () => {
 
   const genderOptions = ["Man", "Woman", "Non-binary", "Prefer not to say"];
   const lookingForOptions = ["Men", "Women", "Everyone"];
+  const datingPreferenceOptions = [
+    "Long-term relationship",
+    "Short-term fun",
+    "Figuring it out",
+    "New friends",
+  ];
   const feetOptions = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
   const inchesOptions = [
     "0",
@@ -72,12 +78,14 @@ const BasicIdentityScreen = () => {
 
     if (!data.gender) newErrors.gender = "SELECT YOUR GENDER";
     if (!data.lookingFor) newErrors.lookingFor = "SELECT PREFERENCE";
+    if (!data.datingPreference)
+      newErrors.datingPreference = "SELECT DATING PREFERENCE";
 
     // New fields validation (optional but good to have basic check)
     if (!data.location.trim()) newErrors.location = "LOCATION REQUIRED";
     if (!data.height.trim()) newErrors.height = "HEIGHT REQUIRED";
     if (!data.jobTitle.trim()) newErrors.jobTitle = "JOB TITLE REQUIRED";
-    if (!data.school.trim()) newErrors.school = "SCHOOL/ALMA MATER REQUIRED";
+    if (!data.school.trim()) newErrors.school = "SCHOOL/College REQUIRED";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -196,6 +204,17 @@ const BasicIdentityScreen = () => {
                 onChange={(value) => updateData({ lookingFor: value as any })}
                 placeholder="Select preference"
                 error={errors.lookingFor}
+              />
+
+              <Dropdown
+                label="DATING PREFERENCE"
+                value={data.datingPreference}
+                options={datingPreferenceOptions}
+                onChange={(value) =>
+                  updateData({ datingPreference: value as any })
+                }
+                placeholder="What are you looking for?"
+                error={errors.datingPreference}
               />
             </View>
           </View>

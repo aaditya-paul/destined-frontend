@@ -28,10 +28,12 @@ export const LikeableCard = ({
   children,
   onLike,
   hideLikeBtn = false,
+  cardContent,
 }: {
   children: React.ReactNode;
   onLike?: () => void;
   hideLikeBtn?: boolean;
+  cardContent?: React.ReactNode;
 }) => (
   <View style={styles.cardWrapper}>
     <View style={styles.cardInner}>{children}</View>
@@ -39,7 +41,7 @@ export const LikeableCard = ({
       <View style={styles.floatingLikeTab}>
         <LikeButton
           size={generalSizes.xl}
-          onPress={onLike || (() => {})}
+          onPress={() => onLike && onLike()}
           haptics={true}
           border={false}
         />

@@ -16,6 +16,7 @@ const defaultData: OnboardingData = {
   dateOfBirth: new Date(2000, 0, 1),
   gender: "",
   lookingFor: "",
+  datingPreference: "",
   location: "",
   height: "",
   jobTitle: "",
