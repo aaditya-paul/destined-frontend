@@ -1,4 +1,5 @@
 import { ProfileView } from "@/components/ProfileView";
+import ComplimentModal from "@/components/ui/ComplimentModal";
 import { LikeButton, PassButton } from "@/components/ui/like_unline_actionsBtn";
 import { colors, generalSizes } from "@/constants/globalStyles";
 import { dummyProfiles } from "@/data/dummyData";
@@ -16,6 +17,7 @@ const { width } = Dimensions.get("window");
 export default function HomeScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showComplimentModal, setShowComplimentModal] = useState(false);
   const currentProfile = dummyProfiles[currentIndex];
   const nextProfile = dummyProfiles[(currentIndex + 1) % dummyProfiles.length];
 
@@ -85,7 +87,11 @@ export default function HomeScreen() {
   };
 
   const handleLike = () => {
-    console.log(`Liked: ${currentProfile.firstName}`);
+    setShowComplimentModal(true);
+  };
+
+  const handleSendCompliment = (message: string) => {
+    console.log(`Liked: ${currentProfile.firstName} with message: ${message}`);
     animateSlide("right");
   };
 
@@ -162,6 +168,14 @@ export default function HomeScreen() {
         <PassButton size={generalSizes["4xl"]} onPress={handlePass} />
         <LikeButton size={generalSizes["4xl"]} onPress={handleLike} />
       </View>
+
+      {/* COMPLIMENT MODAL */}
+      <ComplimentModal
+        visible={showComplimentModal}
+        onClose={() => setShowComplimentModal(false)}
+        onSend={handleSendCompliment}
+        profileName={currentProfile.firstName}
+      />
     </View>
   );
 }
