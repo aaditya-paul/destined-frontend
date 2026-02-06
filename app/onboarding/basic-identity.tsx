@@ -31,9 +31,11 @@ const BasicIdentityScreen = () => {
     return { feet: "", inches: "" };
   };
 
-  const [heightFeet, setHeightFeet] = useState(parseHeight(data.height).feet);
+  const [heightFeet, setHeightFeet] = useState(
+    parseHeight(data.height).feet || "0",
+  );
   const [heightInches, setHeightInches] = useState(
-    parseHeight(data.height).inches,
+    parseHeight(data.height).inches || "0",
   );
 
   const genderOptions = ["Man", "Woman", "Non-binary", "Prefer not to say"];
