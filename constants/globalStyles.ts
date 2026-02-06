@@ -4,6 +4,8 @@ export const colors = {
   primaryLight: "#FF8A5B",
   primarySemiTransparent: "#ff6347c4",
   secondary: "#1E3A5F",
+  secondarySemiTransparemt: "#1E3A5Fc4",
+  secondaryLight: "#1E3A5F80",
   text: "#1E1E1E",
   textSecondary: "#8A8A8A",
   white: "#FFFFFF",

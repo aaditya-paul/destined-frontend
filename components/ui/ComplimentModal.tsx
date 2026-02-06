@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -56,13 +57,11 @@ const ComplimentModal = ({
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.select({ ios: 80, android: 0 })}
         style={styles.modalOverlay}
       >
-        <TouchableOpacity
-          //   style={styles.backdrop}
-          activeOpacity={1}
-          onPress={handleClose}
-        />
+        <Pressable style={styles.backdrop} onPress={handleClose} />
+
         <View style={styles.modalContent}>
           <View style={styles.header}>
             <View style={styles.headerLeft}>
@@ -73,10 +72,25 @@ const ComplimentModal = ({
               <Ionicons name="close" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
-
-          <Text style={styles.subtitle}>
-            Stand out with a thoughtful first message to {profileName}
-          </Text>
+          <View>
+            <Text style={styles.subtitle}>
+              Stand out with a thoughtful first message to
+              <Text
+                style={[
+                  styles.subtitle,
+                  {
+                    color: colors.primary,
+                    fontFamily: fontFamilies.variable,
+                    fontWeight: "700",
+                  },
+                ]}
+              >
+                {" "}
+                {profileName}
+              </Text>
+              .
+            </Text>
+          </View>
 
           <View style={styles.inputContainer}>
             <TextInput
@@ -145,19 +159,24 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.45)",
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
     backgroundColor: colors.background,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     paddingTop: spacing.lg,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
     maxHeight: "85%",
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: -6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 14,
   },
   header: {
     flexDirection: "row",
@@ -171,7 +190,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   title: {
-    fontSize: fontSizes.xl,
+    fontSize: fontSizes.lg,
     fontFamily: fontFamilies.bold,
     color: colors.text,
   },
@@ -190,7 +209,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.inputBackground,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.secondary,
     padding: spacing.md,
     marginBottom: spacing.md,
   },
@@ -216,8 +235,9 @@ const styles = StyleSheet.create({
   suggestionsTitle: {
     fontSize: fontSizes.sm,
     fontFamily: fontFamilies.primary.medium,
-    color: colors.textSecondary,
+    color: colors.secondary,
     marginBottom: spacing.sm,
+    fontWeight: "700",
   },
   suggestionChips: {
     flexDirection: "row",
@@ -226,16 +246,16 @@ const styles = StyleSheet.create({
   },
   suggestionChip: {
     backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: borderRadius.lg,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
+    borderColor: colors.secondary,
+    borderWidth: 1,
   },
   suggestionText: {
     fontSize: fontSizes.sm,
     fontFamily: fontFamilies.primary.regular,
-    color: colors.text,
+    color: colors.secondarySemiTransparemt,
   },
   sendButton: {
     backgroundColor: colors.primary,

@@ -1,6 +1,6 @@
 import { ProfileView } from "@/components/ProfileView";
-import { LikeButton, PassButton } from "@/components/ui/like_unline_actionsBtn";
 import ComplimentModal from "@/components/ui/ComplimentModal";
+import { LikeButton, PassButton } from "@/components/ui/like_unline_actionsBtn";
 import { colors, generalSizes, spacing } from "@/constants/globalStyles";
 import { useOnboarding } from "@/context/OnboardingContext";
 import React, { useState } from "react";
