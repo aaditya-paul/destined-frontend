@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   // Action Bar
   interactionBar: {
     position: "absolute",
-    bottom: 40,
+    bottom: 110,
     flexDirection: "row",
     width: "100%",
     justifyContent: "center",
