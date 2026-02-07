@@ -1,7 +1,12 @@
-import { colors, generalSizes } from "@/constants/globalStyles";
+import {
+  colors,
+  fontFamilies,
+  generalSizes,
+  spacing,
+} from "@/constants/globalStyles";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -146,4 +151,42 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     zIndex: 20,
   },
+  matchBtn: {
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: colors.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: spacing.xl,
+    gap: spacing.sm,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+    zIndex: 20,
+  },
+  matchBtnText: {
+    color: colors.white,
+    fontFamily: fontFamilies.bold,
+    fontSize: 20,
+    letterSpacing: 1,
+  },
 });
+
+export const MatchButton = ({
+  onPress,
+  haptics = true,
+}: {
+  onPress: () => void;
+  haptics?: boolean;
+}) => (
+  <AnimatedPressable
+    onPress={onPress}
+    style={styles.matchBtn}
+    haptics={haptics}
+  >
+    <Ionicons name="heart" size={32} color={colors.white} />
+    <Text style={styles.matchBtnText}>MATCH</Text>
+  </AnimatedPressable>
+);

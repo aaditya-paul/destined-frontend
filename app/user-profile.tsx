@@ -1,23 +1,18 @@
 import { ProfileView } from "@/components/ProfileView";
+import { ComplimentHeader } from "@/components/ui/ComplimentHeader";
 import ComplimentModal from "@/components/ui/ComplimentModal";
-import { LikeButton, PassButton } from "@/components/ui/like_unline_actionsBtn";
 import {
-  colors,
-  fontFamilies,
-  generalSizes,
-  spacing,
-} from "@/constants/globalStyles";
+  LikeButton,
+  MatchButton,
+  PassButton,
+} from "@/components/ui/like_unline_actionsBtn";
+import { colors, generalSizes, spacing } from "@/constants/globalStyles";
 import { dummyProfiles } from "@/data/dummyData";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function UserProfileScreen() {
   const router = useRouter();
@@ -36,6 +31,13 @@ export default function UserProfileScreen() {
   };
 
   const handleMatch = () => {
+    // haptics for match feedback
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    setTimeout(
+      () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy),
+      150,
+    );
+
     // Mock Match Animation/Action
     alert("It's a Match! 🎉");
     router.back();
@@ -73,19 +75,7 @@ export default function UserProfileScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         {receivedCompliment && (
-          <View style={styles.complimentHeader}>
-            <View style={styles.complimentBadge}>
-              <Ionicons
-                name="chatbubble-ellipses"
-                size={16}
-                color={colors.white}
-              />
-              <Text style={styles.complimentBadgeText}>
-                Sent you a compliment
-              </Text>
-            </View>
-            <Text style={styles.complimentText}>"{receivedCompliment}"</Text>
-          </View>
+          <ComplimentHeader compliment={receivedCompliment} />
         )}
         <ProfileView profile={profile} onCardLike={handleCardLike} />
       </ScrollView>
@@ -94,14 +84,7 @@ export default function UserProfileScreen() {
       <View style={styles.interactionBar}>
         <PassButton size={generalSizes["4xl"]} onPress={handlePass} />
         {receivedCompliment ? (
-          <TouchableOpacity
-            style={styles.matchButton}
-            onPress={handleMatch}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="heart" size={32} color={colors.white} />
-            <Text style={styles.matchButtonText}>MATCH</Text>
-          </TouchableOpacity>
+          <MatchButton onPress={handleMatch} />
         ) : (
           <LikeButton size={generalSizes["4xl"]} onPress={handleLike} />
         )}
@@ -151,61 +134,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: spacing.xl,
     alignItems: "center",
-  },
-  matchButton: {
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: colors.primary,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: spacing.xl,
-    gap: spacing.sm,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-  matchButtonText: {
-    color: colors.white,
-    fontFamily: fontFamilies.bold,
-    fontSize: 20,
-    letterSpacing: 1,
-  },
-  complimentHeader: {
-    marginTop: 80, // Space for close button
-    marginHorizontal: spacing.xl,
-    backgroundColor: colors.white,
-    padding: spacing.lg,
-    borderRadius: 20,
-    marginBottom: spacing.md,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  complimentBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.secondary,
-    alignSelf: "flex-start",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 6,
-    marginBottom: spacing.sm,
-  },
-  complimentBadgeText: {
-    color: colors.white,
-    fontFamily: fontFamilies.bold,
-    fontSize: 10,
-    textTransform: "uppercase",
-  },
-  complimentText: {
-    fontFamily: fontFamilies.primary.medium,
-    fontSize: 16,
-    color: colors.text,
-    lineHeight: 24,
   },
 });

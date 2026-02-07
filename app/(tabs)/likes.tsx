@@ -35,7 +35,6 @@ export default function LikesScreen() {
     index: number;
   }) => {
     // Simulate "premium" gate for items after the first 2
-    const isBlurred = index > 1;
     // Generate a random match percentage for demo
     const matchPercentage = 85 + (index % 15);
 
@@ -44,17 +43,14 @@ export default function LikesScreen() {
         activeOpacity={0.9}
         style={[styles.card, { height }]}
         onPress={() => {
-          if (!isBlurred) {
-            router.push({
-              pathname: "/user-profile",
-              params: {
-                id: index,
-                compliment: profile.receivedCompliment,
-              },
-            });
-          }
+          router.push({
+            pathname: "/user-profile",
+            params: {
+              id: index,
+              compliment: profile.receivedCompliment,
+            },
+          });
         }}
-        disabled={isBlurred}
       >
         <Image
           source={{ uri: profile.images[0]?.uri }}
@@ -62,7 +58,7 @@ export default function LikesScreen() {
         />
 
         {/* Compliment Bubble - Only show if not blurred */}
-        {!isBlurred && profile.receivedCompliment ? (
+        {profile.receivedCompliment ? (
           <View style={styles.complimentContainer}>
             <View style={styles.complimentBubble}>
               <Ionicons name="heart" size={12} color={colors.primary} />
@@ -73,11 +69,10 @@ export default function LikesScreen() {
           </View>
         ) : (
           // Fallback Match Badge
-          !isBlurred && (
-            <View style={styles.matchBadge}>
-              <Text style={styles.matchText}>{matchPercentage}% MATCH</Text>
-            </View>
-          )
+
+          <View style={styles.matchBadge}>
+            <Text style={styles.matchText}>{matchPercentage}% MATCH</Text>
+          </View>
         )}
 
         {/* Gradient Overlay for depth */}
