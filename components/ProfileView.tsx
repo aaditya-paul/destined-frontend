@@ -220,22 +220,83 @@ const VoicePrompt = ({
 const PollSection = ({
   question,
   options,
+  correctAnswerIndex,
 }: {
   question: string;
-  options: { label: string; percent: string }[];
-}) => (
-  <View style={styles.cardPadding}>
-    <Text style={styles.cardLabel}>THIS OR THAT</Text>
-    <Text style={styles.pollQuestion}>{question}</Text>
-    {options.map((opt, i) => (
-      <TouchableOpacity key={i} style={styles.pollOption}>
-        <View style={[styles.pollResultBar, { width: opt.percent as any }]} />
-        <Text style={styles.pollOptionText}>{opt.label}</Text>
-        <Text style={styles.pollPercentText}>{opt.percent}</Text>
-      </TouchableOpacity>
-    ))}
-  </View>
-);
+  options: { label: string }[];
+  correctAnswerIndex: number | null;
+}) => {
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [hasAnswered, setHasAnswered] = useState(false);
+
+  const handleOptionPress = (index: number) => {
+    if (hasAnswered) return; // Prevent changing answer after selection
+    setSelectedIndex(index);
+    setHasAnswered(true);
+  };
+
+  return (
+    <View style={styles.cardPadding}>
+      <Text style={styles.cardLabel}>MCQ CHALLENGE</Text>
+      <Text style={styles.pollQuestion}>{question}</Text>
+      {options.map((opt, i) => {
+        const isSelected = selectedIndex === i;
+        const isCorrect = correctAnswerIndex === i;
+        const showCorrect = hasAnswered && isCorrect;
+        const showIncorrect = hasAnswered && isSelected && !isCorrect;
+
+        return (
+          <TouchableOpacity
+            key={i}
+            style={[
+              styles.mcqOption,
+              showCorrect && styles.mcqOptionCorrect,
+              showIncorrect && styles.mcqOptionIncorrect,
+              !hasAnswered && styles.mcqOptionClickable,
+            ]}
+            onPress={() => handleOptionPress(i)}
+            disabled={hasAnswered}
+          >
+            <View
+              style={[
+                styles.mcqOptionCircle,
+                showCorrect && styles.mcqOptionCircleCorrect,
+                showIncorrect && styles.mcqOptionCircleIncorrect,
+              ]}
+            >
+              {hasAnswered && (isCorrect || (isSelected && !isCorrect)) ? (
+                <Ionicons
+                  name={isCorrect ? "checkmark" : "close"}
+                  size={18}
+                  color={colors.white}
+                />
+              ) : (
+                <Text style={styles.mcqOptionLetter}>
+                  {String.fromCharCode(65 + i)}
+                </Text>
+              )}
+            </View>
+            <Text
+              style={[
+                styles.mcqOptionText,
+                (showCorrect || showIncorrect) && styles.mcqOptionTextBold,
+              ]}
+            >
+              {opt.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+      {hasAnswered && (
+        <Text style={styles.mcqFeedback}>
+          {selectedIndex === correctAnswerIndex
+            ? "🎉 Correct! You know them well!"
+            : "Keep guessing! Every answer reveals more."}
+        </Text>
+      )}
+    </View>
+  );
+};
 
 interface ProfileViewProps {
   profile: OnboardingData;
@@ -433,6 +494,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <PollSection
                 question={profile.poll.question || "Help me decide?"}
                 options={profile.poll.options}
+                correctAnswerIndex={profile.poll.correctAnswerIndex}
               />,
             )
           }
@@ -440,6 +502,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <PollSection
             question={profile.poll.question || "Help me decide?"}
             options={profile.poll.options}
+            correctAnswerIndex={profile.poll.correctAnswerIndex}
           />
         </LikeableCard>
 
@@ -700,34 +763,66 @@ const styles = StyleSheet.create({
     color: colors.secondary,
     marginBottom: spacing.md,
   },
-  pollOption: {
-    position: "relative",
+  mcqOption: {
     backgroundColor: colors.background,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: spacing.md,
     marginBottom: spacing.sm,
     flexDirection: "row",
     alignItems: "center",
-    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: colors.secondary,
+    gap: spacing.md,
   },
-  pollResultBar: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    backgroundColor: colors.primaryLight,
-    opacity: 0.2,
+  mcqOptionClickable: {
+    borderColor: colors.secondary,
+    opacity: 0.8,
   },
-  pollOptionText: {
+  mcqOptionCorrect: {
+    backgroundColor: "rgba(76, 175, 80, 0.1)",
+    borderColor: "#4CAF50",
+    borderWidth: 2,
+  },
+  mcqOptionIncorrect: {
+    backgroundColor: "rgba(244, 67, 54, 0.1)",
+    borderColor: "#F44336",
+    borderWidth: 2,
+  },
+  mcqOptionCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.secondary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  mcqOptionCircleCorrect: {
+    backgroundColor: "#4CAF50",
+  },
+  mcqOptionCircleIncorrect: {
+    backgroundColor: "#F44336",
+  },
+  mcqOptionLetter: {
+    fontSize: 14,
+    fontFamily: fontFamilies.bold,
+    color: colors.white,
+  },
+  mcqOptionText: {
     flex: 1,
     fontSize: 14,
     fontFamily: fontFamilies.variable,
     color: colors.secondary,
   },
-  pollPercentText: {
+  mcqOptionTextBold: {
+    fontFamily: fontFamilies.bold,
+  },
+  mcqFeedback: {
+    marginTop: spacing.md,
     fontSize: 13,
     fontFamily: fontFamilies.bold,
     color: colors.primary,
+    textAlign: "center",
+    fontStyle: "italic",
   },
 
   // Interests

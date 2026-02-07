@@ -2,12 +2,9 @@ import React, { createContext, useContext, useState } from "react";
 import { OnboardingContextType, OnboardingData, PollData } from "./types";
 
 const defaultPoll: PollData = {
-  question: "Best way to spend a Sunday?",
-  options: [
-    { label: "Brunch & Mimosas", percent: "45%" },
-    { label: "Hiking Nature", percent: "30%" },
-    { label: "Gaming Marathon", percent: "25%" },
-  ],
+  question: "",
+  options: [{ label: "" }, { label: "" }, { label: "" }],
+  correctAnswerIndex: null,
 };
 
 const defaultData: OnboardingData = {

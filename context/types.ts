@@ -1,6 +1,7 @@
 export interface PollData {
   question: string;
-  options: { label: string; percent: string }[];
+  options: { label: string }[];
+  correctAnswerIndex: number | null;
 }
 
 export type Gender = "Man" | "Woman" | "Non-binary" | "Prefer not to say" | "";

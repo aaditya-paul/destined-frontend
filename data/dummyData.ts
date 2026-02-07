@@ -17,10 +17,11 @@ export const dummyProfiles: OnboardingData[] = [
     poll: {
       question: "Perfect Sunday vibes?",
       options: [
-        { label: "Brunch & Gallery Hopping", percent: "55%" },
-        { label: "Hiking Adventure", percent: "30%" },
-        { label: "Netflix & Chill", percent: "15%" },
+        { label: "Brunch & Gallery Hopping" },
+        { label: "Hiking Adventure" },
+        { label: "Netflix & Chill" },
       ],
+      correctAnswerIndex: 1,
     },
     voiceNoteDuration: "0:42",
     voiceNoteUri:
@@ -64,10 +65,11 @@ export const dummyProfiles: OnboardingData[] = [
     poll: {
       question: "Friday night plans?",
       options: [
-        { label: "Gaming Session", percent: "45%" },
-        { label: "Concert/Show", percent: "40%" },
-        { label: "Art Museum", percent: "15%" },
+        { label: "Gaming Session" },
+        { label: "Concert/Show" },
+        { label: "Art Museum" },
       ],
+      correctAnswerIndex: 0,
     },
     voiceNoteDuration: "1:03",
     images: [
@@ -107,10 +109,11 @@ export const dummyProfiles: OnboardingData[] = [
     poll: {
       question: "Ideal date night?",
       options: [
-        { label: "Trying New Restaurant", percent: "50%" },
-        { label: "Cozy Wine Bar", percent: "35%" },
-        { label: "Outdoor Activity", percent: "15%" },
+        { label: "Trying New Restaurant" },
+        { label: "Cozy Wine Bar" },
+        { label: "Outdoor Activity" },
       ],
+      correctAnswerIndex: 1,
     },
     voiceNoteDuration: "0:35",
     images: [
@@ -147,11 +150,8 @@ export const dummyProfiles: OnboardingData[] = [
     interests: ["Coding", "K-pop", "Boba", "Anime", "Tech", "Food"],
     poll: {
       question: "Late night craving?",
-      options: [
-        { label: "Ramen", percent: "50%" },
-        { label: "Pizza", percent: "30%" },
-        { label: "Tacos", percent: "20%" },
-      ],
+      options: [{ label: "Ramen" }, { label: "Pizza" }, { label: "Tacos" }],
+      correctAnswerIndex: 0,
     },
     voiceNoteDuration: "0:58",
     images: [
@@ -191,10 +191,11 @@ export const dummyProfiles: OnboardingData[] = [
     poll: {
       question: "Morning routine starter?",
       options: [
-        { label: "Workout", percent: "60%" },
-        { label: "Coffee First", percent: "25%" },
-        { label: "Meditation", percent: "15%" },
+        { label: "Workout" },
+        { label: "Coffee First" },
+        { label: "Meditation" },
       ],
+      correctAnswerIndex: 0,
     },
     voiceNoteDuration: "0:47",
     images: [

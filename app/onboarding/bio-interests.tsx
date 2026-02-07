@@ -77,8 +77,12 @@ const BioInterestsScreen = () => {
     }
   }
 
-  // Local state for Poll editing (simplified for now)
+  // Local state for Poll editing
   const [pollQuestion, setPollQuestion] = useState(data.poll.question);
+  const [pollOptions, setPollOptions] = useState(data.poll.options);
+  const [correctAnswerIndex, setCorrectAnswerIndex] = useState<number | null>(
+    data.poll.correctAnswerIndex,
+  );
 
   const availableInterests = [
     "Travel",
@@ -112,6 +116,12 @@ const BioInterestsScreen = () => {
     }
   };
 
+  const updatePollOption = (index: number, newLabel: string) => {
+    const updatedOptions = [...pollOptions];
+    updatedOptions[index] = { ...updatedOptions[index], label: newLabel };
+    setPollOptions(updatedOptions);
+  };
+
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
     if (!data.bio.trim() || data.bio.trim().length < 20) {
@@ -119,6 +129,15 @@ const BioInterestsScreen = () => {
     }
     if (data.interests.length < 3) {
       newErrors.interests = "SELECT AT LEAST 3 ATTRIBUTES.";
+    }
+    if (!pollQuestion.trim()) {
+      newErrors.poll = "MCQ QUESTION IS REQUIRED.";
+    }
+    if (pollOptions.some((opt) => !opt.label.trim())) {
+      newErrors.pollOptions = "ALL MCQ OPTIONS MUST BE FILLED.";
+    }
+    if (correctAnswerIndex === null) {
+      newErrors.correctAnswer = "SELECT THE CORRECT ANSWER.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -128,8 +147,9 @@ const BioInterestsScreen = () => {
     // Save local poll state to context before continuing
     updateData({
       poll: {
-        ...data.poll,
         question: pollQuestion,
+        options: pollOptions,
+        correctAnswerIndex: correctAnswerIndex,
       },
     });
 
@@ -340,28 +360,63 @@ const BioInterestsScreen = () => {
             </LikeableCard>
           </View>
 
-          {/* Poll Creation (Simplified) */}
+          {/* MCQ Creation */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>QUERY INTERFACE</Text>
+            <Text style={styles.sectionLabel}>MCQ CHALLENGE</Text>
+            {(errors.poll || errors.pollOptions || errors.correctAnswer) && (
+              <Text style={styles.errorText}>
+                {errors.poll || errors.pollOptions || errors.correctAnswer}
+              </Text>
+            )}
             <LikeableCard hideLikeBtn={true}>
               <View style={styles.pollCardContent}>
                 <TextInput
-                  label="POLL QUESTION"
+                  label="YOUR QUESTION"
                   value={pollQuestion}
                   onChangeText={setPollQuestion}
-                  placeholder="Ask something..."
+                  placeholder="Best way to spend a Sunday?"
                   containerStyle={{ marginBottom: spacing.md }}
                 />
-                <View style={styles.pollOptionVisual}>
-                  {data.poll.options.map((opt, i) => (
-                    <View key={i} style={styles.pollOptionRow}>
-                      <View style={styles.pollBar} />
-                      <Text style={styles.pollOptionText}>{opt.label}</Text>
+                <Text style={styles.optionsLabel}>OPTIONS</Text>
+                <View style={styles.pollOptionsEditContainer}>
+                  {pollOptions.map((opt, i) => (
+                    <View key={i} style={styles.mcqOptionRow}>
+                      <TouchableOpacity
+                        style={[
+                          styles.correctAnswerBtn,
+                          correctAnswerIndex === i &&
+                            styles.correctAnswerBtnActive,
+                        ]}
+                        onPress={() => setCorrectAnswerIndex(i)}
+                      >
+                        <Ionicons
+                          name={
+                            correctAnswerIndex === i
+                              ? "checkmark-circle"
+                              : "radio-button-off"
+                          }
+                          size={24}
+                          color={
+                            correctAnswerIndex === i
+                              ? colors.primary
+                              : colors.textSecondary
+                          }
+                        />
+                      </TouchableOpacity>
+                      <View style={styles.optionInputWrapper}>
+                        <TextInput
+                          value={opt.label}
+                          onChangeText={(text) => updatePollOption(i, text)}
+                          placeholder={`Option ${i + 1}`}
+                          containerStyle={{ marginBottom: 0 }}
+                        />
+                      </View>
                     </View>
                   ))}
                 </View>
                 <Text style={styles.pollHint}>
-                  *Options are set to default for demo*
+                  Tap the circle to mark the correct answer. Others will try to
+                  guess!
                 </Text>
               </View>
             </LikeableCard>
@@ -508,30 +563,31 @@ const styles = StyleSheet.create({
   pollCardContent: {
     padding: spacing.lg,
   },
-  pollOptionVisual: {
-    gap: 8,
-    marginTop: spacing.sm,
-    opacity: 0.6,
-  },
-  pollOptionRow: {
-    backgroundColor: "#F5F5F5",
-    padding: 12,
-    borderRadius: 8,
-    overflow: "hidden",
-    position: "relative",
-  },
-  pollBar: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: "30%",
-    backgroundColor: "#E0E0E0",
-  },
-  pollOptionText: {
-    fontSize: 12,
+  optionsLabel: {
+    fontSize: 10,
     fontFamily: fontFamilies.bold,
     color: colors.textSecondary,
+    letterSpacing: 2,
+    marginBottom: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  pollOptionsEditContainer: {
+    gap: spacing.md,
+  },
+  mcqOptionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    // marginBottom: spacing.sm,
+  },
+  correctAnswerBtn: {
+    padding: spacing.xs,
+  },
+  correctAnswerBtnActive: {
+    transform: [{ scale: 1.1 }],
+  },
+  optionInputWrapper: {
+    flex: 1,
   },
   pollHint: {
     marginTop: spacing.md,
