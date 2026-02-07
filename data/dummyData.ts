@@ -1,4 +1,4 @@
-import { OnboardingData } from "@/context/types";
+import { Chat, OnboardingData } from "@/context/types";
 
 export const dummyProfiles: OnboardingData[] = [
   {
@@ -226,4 +226,64 @@ export const dummyProfiles: OnboardingData[] = [
     ],
     receivedCompliment: "Your playlist must be fire 🔥",
   },
+];
+
+export const dummyChats: Chat[] = [
+  {
+    id: "1",
+    user: dummyProfiles[1], // Jessica
+    lastMessage: "Omg yes! FF7 Remake was so good.",
+    unread: true,
+    messages: [
+      {
+        id: "m1",
+        text: "Finally someone who appreciates Final Fantasy!",
+        sender: "them",
+        timestamp: new Date(Date.now() - 86400000),
+      },
+      {
+        id: "m2",
+        text: "Haha right? It's a classic.",
+        sender: "user",
+        timestamp: new Date(Date.now() - 80000000),
+      },
+      {
+        id: "m3",
+        text: "Omg yes! FF7 Remake was so good.",
+        sender: "them",
+        timestamp: new Date(Date.now() - 1000 * 60 * 5), // 5 mins ago
+      },
+    ],
+  },
+  {
+    id: "2",
+    user: dummyProfiles[3], // Maya
+    lastMessage: "I'll send you the playlist!",
+    unread: false,
+    messages: [
+      {
+        id: "m1",
+        text: "K-pop and coding? We might be soulmates.",
+        sender: "them",
+        timestamp: new Date(Date.now() - 172800000),
+      },
+      {
+        id: "m2",
+        text: "Haha I try my best! What groups do you like?",
+        sender: "user",
+        timestamp: new Date(Date.now() - 170000000),
+      },
+      {
+        id: "m3",
+        text: "I'll send you the playlist!",
+        sender: "them",
+        timestamp: new Date(Date.now() - 3600000), // 1 hour ago
+      },
+    ],
+  },
+];
+
+export const dummyNewMatches: OnboardingData[] = [
+  dummyProfiles[4], // Olivia
+  dummyProfiles[2], // Emily
 ];

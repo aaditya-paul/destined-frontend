@@ -40,6 +40,21 @@ export interface OnboardingData {
   receivedCompliment?: string;
 }
 
+export interface Message {
+  id: string;
+  text: string;
+  sender: "user" | "them";
+  timestamp: Date;
+}
+
+export interface Chat {
+  id: string;
+  user: OnboardingData;
+  lastMessage: string;
+  unread: boolean;
+  messages: Message[];
+}
+
 export interface ImageItem {
   uri: string;
   prompt?: string;
