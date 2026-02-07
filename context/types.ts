@@ -35,6 +35,9 @@ export interface OnboardingData {
 
   // Visuals
   images: (ImageItem | undefined)[];
+
+  // Interaction
+  receivedCompliment?: string;
 }
 
 export interface ImageItem {

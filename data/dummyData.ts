@@ -48,6 +48,7 @@ export const dummyProfiles: OnboardingData[] = [
         uri: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=1887&auto=format&fit=crop",
       },
     ],
+    receivedCompliment: "Your hiking photos are amazing! Where was that taken?",
   },
   {
     firstName: "Jessica",
@@ -92,6 +93,7 @@ export const dummyProfiles: OnboardingData[] = [
       },
       undefined,
     ],
+    receivedCompliment: "Finally someone who appreciates Final Fantasy!",
   },
   {
     firstName: "Emily",
@@ -134,6 +136,7 @@ export const dummyProfiles: OnboardingData[] = [
       undefined,
       undefined,
     ],
+    receivedCompliment: "Love the sarcasm in your bio haha",
   },
   {
     firstName: "Maya",
@@ -174,6 +177,7 @@ export const dummyProfiles: OnboardingData[] = [
       },
       undefined,
     ],
+    receivedCompliment: "K-pop and coding? We might be soulmates.",
   },
   {
     firstName: "Olivia",
@@ -220,5 +224,6 @@ export const dummyProfiles: OnboardingData[] = [
         uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop",
       },
     ],
+    receivedCompliment: "Your playlist must be fire 🔥",
   },
 ];

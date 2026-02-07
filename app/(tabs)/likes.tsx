@@ -44,23 +44,45 @@ export default function LikesScreen() {
         activeOpacity={0.9}
         style={[styles.card, { height }]}
         onPress={() => {
-          router.push({ pathname: "/user-profile", params: { id: index } });
+          if (!isBlurred) {
+            router.push({
+              pathname: "/user-profile",
+              params: {
+                id: index,
+                compliment: profile.receivedCompliment,
+              },
+            });
+          }
         }}
+        disabled={isBlurred}
       >
         <Image
           source={{ uri: profile.images[0]?.uri }}
           style={styles.cardImage}
         />
 
-        {/* Match Badge - Only show if not blurred */}
-
-        <View style={styles.matchBadge}>
-          <Text style={styles.matchText}>{matchPercentage}% MATCH</Text>
-        </View>
+        {/* Compliment Bubble - Only show if not blurred */}
+        {!isBlurred && profile.receivedCompliment ? (
+          <View style={styles.complimentContainer}>
+            <View style={styles.complimentBubble}>
+              <Ionicons name="heart" size={12} color={colors.primary} />
+              <Text style={styles.complimentText} numberOfLines={3}>
+                "{profile.receivedCompliment}"
+              </Text>
+            </View>
+          </View>
+        ) : (
+          // Fallback Match Badge
+          !isBlurred && (
+            <View style={styles.matchBadge}>
+              <Text style={styles.matchText}>{matchPercentage}% MATCH</Text>
+            </View>
+          )
+        )}
 
         {/* Gradient Overlay for depth */}
         <LinearGradient
-          colors={["transparent", "rgba(0,0,0,0.6)"]}
+          colors={["transparent", "rgba(0,0,0,0.8)"]}
           style={styles.gradientOverlay}
         />
 
@@ -177,6 +199,36 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.bold,
     color: colors.primary,
     letterSpacing: 0.5,
+  },
+  complimentContainer: {
+    position: "absolute",
+    top: 12,
+    left: 12,
+    right: 12,
+    zIndex: 10,
+    alignItems: "flex-start",
+  },
+  complimentBubble: {
+    backgroundColor: colors.white,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    borderBottomLeftRadius: 4, // Chat bubble look
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    flexDirection: "row",
+    gap: 6,
+    alignItems: "center",
+  },
+  complimentText: {
+    fontSize: 12,
+    fontFamily: fontFamilies.primary.medium,
+    color: colors.text,
+    lineHeight: 16,
+    flex: 1,
   },
   gradientOverlay: {
     position: "absolute",
