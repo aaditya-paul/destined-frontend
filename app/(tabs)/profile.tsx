@@ -36,7 +36,8 @@ export default function ProfileScreen() {
     else score += (data.interests.length / 5) * 15;
 
     // Voice note (10 points)
-    if (data.voiceNoteDuration && data.voiceNoteDuration > 0) score += 10;
+    if (data.voiceNoteDuration && data.voiceNoteDuration.length > 0)
+      score += 10;
 
     // Basic info completion (20 points)
     const basicFields = [
@@ -209,6 +210,17 @@ export default function ProfileScreen() {
               ]}
             >
               Update your information
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => router.push("/settings")}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.actionButtonText}>SETTINGS</Text>
+            <Text style={styles.actionButtonSubtext}>
+              App preferences & account
             </Text>
           </TouchableOpacity>
         </View>
