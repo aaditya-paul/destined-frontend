@@ -2,49 +2,64 @@ import { ProfileView } from "@/components/ProfileView";
 import ComplimentModal from "@/components/ui/ComplimentModal";
 import { LikeButton, PassButton } from "@/components/ui/like_unline_actionsBtn";
 import { colors, generalSizes, spacing } from "@/constants/globalStyles";
-import { useOnboarding } from "@/context/OnboardingContext";
+import { dummyProfiles } from "@/data/dummyData";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 
-const ProfilePreviewScreen = () => {
-  const { data } = useOnboarding();
+export default function UserProfileScreen() {
   const router = useRouter();
+  const { id } = useLocalSearchParams();
+  // Decode the profile index from params or default to 0
+  const profileIndex = id ? parseInt(id as string, 10) : 0;
+  const profile = dummyProfiles[profileIndex] || dummyProfiles[0];
+
   const [showComplimentModal, setShowComplimentModal] = useState(false);
   const [selectedCardContext, setSelectedCardContext] =
     useState<React.ReactNode>(null);
+
   const handleLike = () => {
     setShowComplimentModal(true);
   };
+
   const handleCardLike = (cardContent: React.ReactNode) => {
     setSelectedCardContext(cardContent);
     setShowComplimentModal(true);
   };
 
   const handleSendCompliment = (message: string) => {
-    console.log(`Liked with message: ${message}`);
-    // Handle the like action with message
+    console.log(`Liked ${profile.firstName} with message: ${message}`);
+    // Close modal and go back
+    setShowComplimentModal(false);
+    setSelectedCardContext(null);
+    router.back();
+  };
+
+  const handlePass = () => {
+    router.back();
   };
 
   return (
     <View style={styles.container}>
-      {/* fixed back btn */}
-      <View style={styles.backBtn}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={colors.secondary} />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={() => router.back()}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="close" size={24} color={colors.secondary} />
+      </TouchableOpacity>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <ProfileView onCardLike={handleCardLike} profile={data} />
+        <ProfileView profile={profile} onCardLike={handleCardLike} />
       </ScrollView>
 
       {/* FIXED ACTION BAR */}
       <View style={styles.interactionBar}>
-        <PassButton size={generalSizes["4xl"]} onPress={() => {}} />
+        <PassButton size={generalSizes["4xl"]} onPress={handlePass} />
         <LikeButton size={generalSizes["4xl"]} onPress={handleLike} />
       </View>
 
@@ -56,27 +71,17 @@ const ProfilePreviewScreen = () => {
           setSelectedCardContext(null);
         }}
         onSend={handleSendCompliment}
-        profileName={data.firstName || "them"}
+        profileName={profile.firstName}
         cardContext={selectedCardContext}
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scrollContent: { paddingBottom: 160 },
-
-  // Action Bar
-  interactionBar: {
-    position: "absolute",
-    bottom: 40,
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "center",
-    gap: spacing.xl,
-  },
-  backBtn: {
+  closeButton: {
     position: "absolute",
     top: 50,
     left: 20,
@@ -93,6 +98,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  // Action Bar
+  interactionBar: {
+    position: "absolute",
+    bottom: 40,
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "center",
+    gap: spacing.xl,
+  },
 });
-
-export default ProfilePreviewScreen;

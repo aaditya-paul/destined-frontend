@@ -1,52 +1,85 @@
 import { EditorialHeader } from "@/components/ui/EditorialComponents";
 import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
 import { dummyProfiles } from "@/data/dummyData";
+import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import React from "react";
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+const { width } = Dimensions.get("window");
+// Optimized column width calculation to prevent overflow
+const COLUMN_WIDTH = (width - spacing.xl * 2 - spacing.md) / 2;
 
 export default function LikesScreen() {
-  const renderItem = ({
-    item,
+  const router = useRouter();
+  const leftColumn = dummyProfiles.filter((_, i) => i % 2 === 0);
+  const rightColumn = dummyProfiles.filter((_, i) => i % 2 !== 0);
+
+  const LikeCard = ({
+    profile,
+    height,
     index,
   }: {
-    item: (typeof dummyProfiles)[0];
+    profile: (typeof dummyProfiles)[0];
+    height: number;
     index: number;
   }) => {
     // Simulate "premium" gate for items after the first 2
     const isBlurred = index > 1;
+    // Generate a random match percentage for demo
+    const matchPercentage = 85 + (index % 15);
 
     return (
-      <View style={styles.cardContainer}>
-        <View style={styles.card}>
-          <Image
-            source={{ uri: item.images[0]?.uri }}
-            style={styles.cardImage}
-          />
-          <View style={styles.cardContent}>
-            <Text style={styles.cardName}>
-              {item.firstName},{" "}
-              {new Date().getFullYear() - item.dateOfBirth.getFullYear()}
-            </Text>
-            <Text style={styles.cardBio} numberOfLines={2}>
-              {item.bio}
-            </Text>
-          </View>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        style={[styles.card, { height }]}
+        onPress={() => {
+          router.push({ pathname: "/user-profile", params: { id: index } });
+        }}
+      >
+        <Image
+          source={{ uri: profile.images[0]?.uri }}
+          style={styles.cardImage}
+        />
+
+        {/* Match Badge - Only show if not blurred */}
+
+        <View style={styles.matchBadge}>
+          <Text style={styles.matchText}>{matchPercentage}% MATCH</Text>
         </View>
 
-        {isBlurred && (
-          <View style={styles.blurContainer}>
-            <BlurView
-              intensity={20}
-              style={StyleSheet.absoluteFill}
-              tint="light"
-            />
-            <View style={styles.lockContainer}>
-              <Text style={styles.lockText}>Upgrade to see who likes you</Text>
+        {/* Gradient Overlay for depth */}
+        <LinearGradient
+          colors={["transparent", "rgba(0,0,0,0.6)"]}
+          style={styles.gradientOverlay}
+        />
+
+        {/* Glassmorphism Details Section */}
+        <BlurView intensity={80} tint="dark" style={styles.glassInfo}>
+          <View>
+            <Text style={styles.cardName}>
+              {profile.firstName},{" "}
+              {new Date().getFullYear() - profile.dateOfBirth.getFullYear()}
+            </Text>
+            <View style={styles.locationRow}>
+              <Ionicons name="location-sharp" size={10} color={colors.white} />
+              <Text style={styles.cardLocation} numberOfLines={1}>
+                {profile.location}
+              </Text>
             </View>
           </View>
-        )}
-      </View>
+        </BlurView>
+      </TouchableOpacity>
     );
   };
 
@@ -56,13 +89,33 @@ export default function LikesScreen() {
         <EditorialHeader title="LIKES" subtitle="See who's interested." />
       </View>
 
-      <FlatList
-        data={dummyProfiles}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-      />
+      >
+        <View style={styles.masonryContainer}>
+          <View style={styles.column}>
+            {leftColumn.map((profile, index) => (
+              <LikeCard
+                key={index}
+                profile={profile}
+                height={index % 2 === 0 ? 260 : 320} // Slightly taller for more elegance
+                index={dummyProfiles.indexOf(profile)}
+              />
+            ))}
+          </View>
+          <View style={styles.column}>
+            {rightColumn.map((profile, index) => (
+              <LikeCard
+                key={index}
+                profile={profile}
+                height={index % 2 === 0 ? 320 : 260}
+                index={dummyProfiles.indexOf(profile)}
+              />
+            ))}
+          </View>
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -77,70 +130,109 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     marginBottom: spacing.md,
   },
-  listContent: {
+  scrollContent: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: 100,
+    paddingBottom: 120,
   },
-  cardContainer: {
-    marginBottom: spacing.md,
-    borderRadius: 16,
-    overflow: "hidden",
-    position: "relative",
-    // Shadow
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-    backgroundColor: colors.white,
+  masonryContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between", // Ensure columns are spaced apart
+    gap: spacing.md,
+  },
+  column: {
+    flex: 1, // Allow columns to take equal width
+    width: COLUMN_WIDTH, // Explicit width optional but good for calculation reference
+    gap: spacing.md,
   },
   card: {
-    flexDirection: "row",
-    height: 100,
-    backgroundColor: colors.white,
+    borderRadius: 20, // Softer corners
+    overflow: "hidden",
+    backgroundColor: colors.disabled,
+    position: "relative",
+    width: "100%",
+    // Enhanced Shadow
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
   },
   cardImage: {
-    width: 100,
-    height: 100,
+    width: "100%",
+    height: "100%",
     resizeMode: "cover",
   },
-  cardContent: {
-    flex: 1,
+  matchBadge: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    zIndex: 10,
+  },
+  matchText: {
+    fontSize: 10,
+    fontFamily: fontFamilies.bold,
+    color: colors.primary,
+    letterSpacing: 0.5,
+  },
+  gradientOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "40%",
+  },
+  glassInfo: {
+    position: "absolute",
+    bottom: 12,
+    left: 12,
+    right: 12,
+    borderRadius: 16,
+    overflow: "hidden",
     padding: spacing.md,
-    justifyContent: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   cardName: {
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: fontFamilies.bold,
-    color: colors.secondary,
+    color: colors.white,
     marginBottom: 4,
   },
-  cardBio: {
-    fontSize: 12,
+  locationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  cardLocation: {
+    fontSize: 10,
     fontFamily: fontFamilies.primary.medium,
-    color: colors.textSecondary,
-    lineHeight: 18,
+    color: "rgba(255, 255, 255, 0.8)",
   },
   blurContainer: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 10,
+    zIndex: 20,
   },
   lockContainer: {
-    backgroundColor: colors.secondary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: 20,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+    borderRadius: 30,
+    alignItems: "center",
+    gap: spacing.xs,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
   },
   lockText: {
     color: colors.white,
     fontFamily: fontFamilies.bold,
     fontSize: 12,
+    letterSpacing: 0.5,
   },
 });

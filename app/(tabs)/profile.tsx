@@ -1,6 +1,7 @@
 import { EditorialHeader } from "@/components/ui/EditorialComponents";
 import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
 import { useOnboarding } from "@/context/OnboardingContext";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
@@ -187,10 +188,22 @@ export default function ProfileScreen() {
             onPress={() => router.push("/profile-preview")}
             activeOpacity={0.8}
           >
-            <Text style={styles.actionButtonText}>PREVIEW PROFILE</Text>
-            <Text style={styles.actionButtonSubtext}>
-              See how others view you
-            </Text>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: spacing.md,
+              }}
+            >
+              <Ionicons name="eye" size={24} color={colors.secondary} />
+              <View>
+                <Text style={styles.actionButtonText}>PREVIEW PROFILE</Text>
+                <Text style={styles.actionButtonSubtext}>
+                  See how others view you
+                </Text>
+              </View>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -198,30 +211,64 @@ export default function ProfileScreen() {
             onPress={() => router.push("/onboarding/basic-identity")}
             activeOpacity={0.8}
           >
-            <Text
-              style={[styles.actionButtonText, styles.actionButtonTextPrimary]}
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: spacing.md,
+              }}
             >
-              EDIT PROFILE
-            </Text>
-            <Text
-              style={[
-                styles.actionButtonSubtext,
-                styles.actionButtonSubtextPrimary,
-              ]}
-            >
-              Update your information
-            </Text>
+              <Ionicons name="pencil" size={24} color={colors.white} />
+              <View>
+                <Text
+                  style={[
+                    styles.actionButtonText,
+                    styles.actionButtonTextPrimary,
+                  ]}
+                >
+                  EDIT PROFILE
+                </Text>
+                <Text
+                  style={[
+                    styles.actionButtonSubtext,
+                    styles.actionButtonSubtextPrimary,
+                  ]}
+                >
+                  Update your information
+                </Text>
+              </View>
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.actionButton}
+            style={[styles.actionButton, { backgroundColor: colors.secondary }]}
             onPress={() => router.push("/settings")}
             activeOpacity={0.8}
           >
-            <Text style={styles.actionButtonText}>SETTINGS</Text>
-            <Text style={styles.actionButtonSubtext}>
-              App preferences & account
-            </Text>
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: spacing.md,
+              }}
+            >
+              <Ionicons name="settings" size={24} color={colors.white} />
+              <View>
+                <Text style={[styles.actionButtonText, { color: "white" }]}>
+                  SETTINGS
+                </Text>
+                <Text
+                  style={[
+                    styles.actionButtonSubtext,
+                    { color: "rgba(255, 255, 255, 0.7)" },
+                  ]}
+                >
+                  App preferences & account
+                </Text>
+              </View>
+            </View>
           </TouchableOpacity>
         </View>
 
