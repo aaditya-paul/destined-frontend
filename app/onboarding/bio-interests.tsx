@@ -130,14 +130,14 @@ const BioInterestsScreen = () => {
     if (data.interests.length < 3) {
       newErrors.interests = "SELECT AT LEAST 3 ATTRIBUTES.";
     }
-    if (!pollQuestion.trim()) {
-      newErrors.poll = "MCQ QUESTION IS REQUIRED.";
-    }
-    if (pollOptions.some((opt) => !opt.label.trim())) {
-      newErrors.pollOptions = "ALL MCQ OPTIONS MUST BE FILLED.";
-    }
-    if (correctAnswerIndex === null) {
-      newErrors.correctAnswer = "SELECT THE CORRECT ANSWER.";
+    // Poll is optional, but if question exists, options must be filled
+    if (pollQuestion.trim()) {
+      if (pollOptions.some((opt) => !opt.label.trim())) {
+        newErrors.pollOptions = "ALL MCQ OPTIONS MUST BE FILLED.";
+      }
+      if (correctAnswerIndex === null) {
+        newErrors.correctAnswer = "SELECT THE CORRECT ANSWER.";
+      }
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -363,9 +363,9 @@ const BioInterestsScreen = () => {
           {/* MCQ Creation */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>MCQ CHALLENGE</Text>
-            {(errors.poll || errors.pollOptions || errors.correctAnswer) && (
+            {(errors.pollOptions || errors.correctAnswer) && (
               <Text style={styles.errorText}>
-                {errors.poll || errors.pollOptions || errors.correctAnswer}
+                {errors.pollOptions || errors.correctAnswer}
               </Text>
             )}
             <LikeableCard hideLikeBtn={true}>

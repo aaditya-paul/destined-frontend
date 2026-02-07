@@ -23,9 +23,11 @@ const { width, height } = Dimensions.get("window");
 const VoicePrompt = ({
   duration,
   uri,
+  disabled = false,
 }: {
   duration: string | null;
   uri?: string | null;
+  disabled?: boolean;
 }) => {
   const [sound, setSound] = useState<Audio.Sound>();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -155,8 +157,9 @@ const VoicePrompt = ({
       <View style={styles.voicePlayerContainer}>
         <TouchableOpacity
           style={[styles.playCircle, isPlaying && styles.playCircleActive]}
-          onPress={playSound}
+          onPress={disabled ? undefined : playSound}
           activeOpacity={0.8}
+          disabled={disabled}
         >
           <Ionicons
             name={isPlaying ? "pause" : "play"}
@@ -169,8 +172,9 @@ const VoicePrompt = ({
         <TouchableOpacity
           style={styles.trackContainer}
           onLayout={(e) => setLayoutWidth(e.nativeEvent.layout.width)}
-          onPress={handleSeek}
+          onPress={disabled ? undefined : handleSeek}
           activeOpacity={1}
+          disabled={disabled}
         >
           <View style={styles.waveFormContainer}>
             {waveHeights.map((h, i) => {
@@ -221,18 +225,31 @@ const PollSection = ({
   question,
   options,
   correctAnswerIndex,
+  disabled = false,
+  initialSelectedIndex = null,
+  initialHasAnswered = false,
+  onSelectionChange,
 }: {
   question: string;
   options: { label: string }[];
   correctAnswerIndex: number | null;
+  disabled?: boolean;
+  initialSelectedIndex?: number | null;
+  initialHasAnswered?: boolean;
+  onSelectionChange?: (selectedIndex: number, hasAnswered: boolean) => void;
 }) => {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [hasAnswered, setHasAnswered] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(initialSelectedIndex);
+  const [hasAnswered, setHasAnswered] = useState(initialHasAnswered);
 
   const handleOptionPress = (index: number) => {
+    if (disabled) return; // Prevent interaction when disabled
     if (hasAnswered) return; // Prevent changing answer after selection
     setSelectedIndex(index);
     setHasAnswered(true);
+    // Notify parent of selection
+    if (onSelectionChange) {
+      onSelectionChange(index, true);
+    }
   };
 
   return (
@@ -252,10 +269,10 @@ const PollSection = ({
               styles.mcqOption,
               showCorrect && styles.mcqOptionCorrect,
               showIncorrect && styles.mcqOptionIncorrect,
-              !hasAnswered && styles.mcqOptionClickable,
+              !hasAnswered && !disabled && styles.mcqOptionClickable,
             ]}
             onPress={() => handleOptionPress(i)}
-            disabled={hasAnswered}
+            disabled={hasAnswered || disabled}
           >
             <View
               style={[
@@ -310,6 +327,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const age = profile.dateOfBirth
     ? new Date().getFullYear() - profile.dateOfBirth.getFullYear()
     : "";
+
+  // Track poll selection state to pass to modal
+  const [pollSelectedIndex, setPollSelectedIndex] = useState<number | null>(null);
+  const [pollHasAnswered, setPollHasAnswered] = useState(false);
 
   return (
     <>
@@ -420,6 +441,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <VoicePrompt
                   duration={profile.voiceNoteDuration}
                   uri={profile.voiceNoteUri}
+                  disabled={true}
                 />,
               )
             }
@@ -488,23 +510,32 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         )}
 
         {/* --- SLOT 5: Poll --- */}
-        <LikeableCard
-          onLike={() =>
-            onCardLike?.(
-              <PollSection
-                question={profile.poll.question || "Help me decide?"}
-                options={profile.poll.options}
-                correctAnswerIndex={profile.poll.correctAnswerIndex}
-              />,
-            )
-          }
-        >
-          <PollSection
-            question={profile.poll.question || "Help me decide?"}
-            options={profile.poll.options}
-            correctAnswerIndex={profile.poll.correctAnswerIndex}
-          />
-        </LikeableCard>
+        {profile.poll.question && profile.poll.options.length > 0 && profile.poll.options.every(opt => opt.label.trim()) && (
+          <LikeableCard
+            onLike={() =>
+              onCardLike?.(
+                <PollSection
+                  question={profile.poll.question || "Help me decide?"}
+                  options={profile.poll.options}
+                  correctAnswerIndex={profile.poll.correctAnswerIndex}
+                  disabled={true}
+                  initialSelectedIndex={pollSelectedIndex}
+                  initialHasAnswered={pollHasAnswered}
+                />,
+              )
+            }
+          >
+            <PollSection
+              question={profile.poll.question || "Help me decide?"}
+              options={profile.poll.options}
+              correctAnswerIndex={profile.poll.correctAnswerIndex}
+              onSelectionChange={(selectedIndex, hasAnswered) => {
+                setPollSelectedIndex(selectedIndex);
+                setPollHasAnswered(hasAnswered);
+              }}
+            />
+          </LikeableCard>
+        )}
 
         {/* --- SLOT 6: Image 3 --- */}
         {profile.images[3]?.uri && (
