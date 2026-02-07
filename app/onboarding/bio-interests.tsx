@@ -6,7 +6,9 @@ import {
 import InterestChip from "@/components/ui/InterestChip";
 import ProgressBar from "@/components/ui/ProgressBar";
 import TextInput from "@/components/ui/TextInput";
+import { AVAILABLE_INTERESTS } from "@/constants/data";
 import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
+import { MICROCOPY } from "@/constants/microcopies";
 import { useOnboarding } from "@/context/OnboardingContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
@@ -32,6 +34,8 @@ const BioInterestsScreen = () => {
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(
     null,
   );
+
+  const CONSTANTS = MICROCOPY.onboarding.bioInterests;
 
   // Playback State
   const [sound, setSound] = useState<Audio.Sound | undefined>();
@@ -84,29 +88,6 @@ const BioInterestsScreen = () => {
     data.poll.correctAnswerIndex,
   );
 
-  const availableInterests = [
-    "Travel",
-    "Photography",
-    "Music",
-    "Cooking",
-    "Fitness",
-    "Reading",
-    "Movies",
-    "Gaming",
-    "Art",
-    "Dancing",
-    "Hiking",
-    "Yoga",
-    "Coffee",
-    "Wine",
-    "Sports",
-    "Technology",
-    "Fashion",
-    "Food",
-    "Pets",
-    "Nature",
-  ];
-
   const toggleInterest = (interest: string) => {
     const current = data.interests;
     if (current.includes(interest)) {
@@ -125,18 +106,18 @@ const BioInterestsScreen = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
     if (!data.bio.trim() || data.bio.trim().length < 20) {
-      newErrors.bio = "YOUR STORY NEEDS MORE DETAIL (MIN 20 CHARS).";
+      newErrors.bio = CONSTANTS.errors.bio;
     }
     if (data.interests.length < 3) {
-      newErrors.interests = "SELECT AT LEAST 3 ATTRIBUTES.";
+      newErrors.interests = CONSTANTS.errors.interests;
     }
     // Poll is optional, but if question exists, options must be filled
     if (pollQuestion.trim()) {
       if (pollOptions.some((opt) => !opt.label.trim())) {
-        newErrors.pollOptions = "ALL MCQ OPTIONS MUST BE FILLED.";
+        newErrors.pollOptions = CONSTANTS.errors.mcqOptions;
       }
       if (correctAnswerIndex === null) {
-        newErrors.correctAnswer = "SELECT THE CORRECT ANSWER.";
+        newErrors.correctAnswer = CONSTANTS.errors.mcqAnswer;
       }
     }
     setErrors(newErrors);
@@ -164,8 +145,8 @@ const BioInterestsScreen = () => {
         <ProgressBar totalSteps={3} currentStep={2} />
         <View style={styles.headerSpacer} />
         <EditorialHeader
-          title="THE_NARRATIVE"
-          subtitle="Define your character and voice."
+          title={CONSTANTS.title}
+          subtitle={CONSTANTS.subtitle}
         />
       </View>
 
@@ -180,7 +161,7 @@ const BioInterestsScreen = () => {
           {/* Bio Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionLabel}>PERSONAL STATEMENT</Text>
+              <Text style={styles.sectionLabel}>{CONSTANTS.bio.label}</Text>
               <Text
                 style={[
                   styles.charCount,
@@ -191,7 +172,7 @@ const BioInterestsScreen = () => {
               </Text>
             </View>
             <TextInput
-              placeholder="What makes you... you?"
+              placeholder={CONSTANTS.bio.placeholder}
               value={data.bio}
               onChangeText={(text) => updateData({ bio: text })}
               error={errors.bio}
@@ -205,7 +186,9 @@ const BioInterestsScreen = () => {
           {/* Interests Section */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionLabel}>ATTRIBUTES & INTERESTS</Text>
+              <Text style={styles.sectionLabel}>
+                {CONSTANTS.interests.label}
+              </Text>
               <Text style={styles.selectionCount}>
                 {data.interests.length}/10
               </Text>
@@ -216,7 +199,7 @@ const BioInterestsScreen = () => {
             )}
 
             <View style={styles.interestsContainer}>
-              {availableInterests.map((interest) => (
+              {AVAILABLE_INTERESTS.map((interest) => (
                 <InterestChip
                   key={interest}
                   label={interest}
@@ -229,12 +212,14 @@ const BioInterestsScreen = () => {
 
           {/* Voice Prompt (Real Recording) */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>AUDIO LOG</Text>
+            <Text style={styles.sectionLabel}>{CONSTANTS.audio.label}</Text>
             <LikeableCard hideLikeBtn={true}>
               <View style={styles.voiceCardContent}>
                 <View style={styles.voiceHeader}>
                   <Text style={styles.voiceLabel}>
-                    {recording ? "RECORDING..." : "RECORD 2 MIN INTRO"}
+                    {recording
+                      ? CONSTANTS.audio.hint.recording
+                      : CONSTANTS.audio.heading}
                   </Text>
                   {data.voiceNoteUri ? (
                     <TouchableOpacity
@@ -353,8 +338,8 @@ const BioInterestsScreen = () => {
                   {recording
                     ? `${Math.floor(recordingDuration / 60)}:${(recordingDuration % 60).toString().padStart(2, "0")} / 2:00`
                     : data.voiceNoteDuration
-                      ? `AUDIO CAPTURED (${data.voiceNoteDuration})`
-                      : "TAP TO RECORD"}
+                      ? `${CONSTANTS.audio.hint.recorded} (${data.voiceNoteDuration})`
+                      : CONSTANTS.audio.hint.default}
                 </Text>
               </View>
             </LikeableCard>
@@ -362,7 +347,7 @@ const BioInterestsScreen = () => {
 
           {/* MCQ Creation */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>MCQ CHALLENGE</Text>
+            <Text style={styles.sectionLabel}>{CONSTANTS.mcq.label}</Text>
             {(errors.pollOptions || errors.correctAnswer) && (
               <Text style={styles.errorText}>
                 {errors.pollOptions || errors.correctAnswer}
@@ -371,13 +356,15 @@ const BioInterestsScreen = () => {
             <LikeableCard hideLikeBtn={true}>
               <View style={styles.pollCardContent}>
                 <TextInput
-                  label="YOUR QUESTION"
+                  label={CONSTANTS.mcq.question.label}
                   value={pollQuestion}
                   onChangeText={setPollQuestion}
-                  placeholder="Best way to spend a Sunday?"
+                  placeholder={CONSTANTS.mcq.question.placeholder}
                   containerStyle={{ marginBottom: spacing.md }}
                 />
-                <Text style={styles.optionsLabel}>OPTIONS</Text>
+                <Text style={styles.optionsLabel}>
+                  {CONSTANTS.mcq.options.label}
+                </Text>
                 <View style={styles.pollOptionsEditContainer}>
                   {pollOptions.map((opt, i) => (
                     <View key={i} style={styles.mcqOptionRow}>
@@ -414,22 +401,19 @@ const BioInterestsScreen = () => {
                     </View>
                   ))}
                 </View>
-                <Text style={styles.pollHint}>
-                  Tap the circle to mark the correct answer. Others will try to
-                  guess!
-                </Text>
+                <Text style={styles.pollHint}>{CONSTANTS.mcq.hint}</Text>
               </View>
             </LikeableCard>
           </View>
 
           <View style={styles.buttonContainer}>
             <CTA_BTN
-              text="SAVE & CONTINUE"
+              text={CONSTANTS.nextBtn}
               onPress={handleContinue}
               btnColor={colors.primary}
             />
             <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.backLink}>GO BACK</Text>
+              <Text style={styles.backLink}>{CONSTANTS.backBtn}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

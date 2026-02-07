@@ -4,7 +4,15 @@ import Dropdown from "@/components/ui/Dropdown";
 import { EditorialHeader } from "@/components/ui/EditorialComponents";
 import ProgressBar from "@/components/ui/ProgressBar";
 import TextInput from "@/components/ui/TextInput";
+import {
+  DATING_PREFERENCE_OPTIONS,
+  FEET_OPTIONS,
+  GENDER_OPTIONS,
+  INCHES_OPTIONS,
+  LOOKING_FOR_OPTIONS,
+} from "@/constants/data";
 import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
+import { MICROCOPY } from "@/constants/microcopies";
 import { useOnboarding } from "@/context/OnboardingContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -22,6 +30,8 @@ const BasicIdentityScreen = () => {
   const { data, updateData } = useOnboarding();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+  const CONSTANTS = MICROCOPY.onboarding.basicIdentity;
+
   // Parse existing height or default to empty
   const parseHeight = (heightStr: string) => {
     const match = heightStr.match(/(\d+)'(\d+)"/);
@@ -37,30 +47,6 @@ const BasicIdentityScreen = () => {
   const [heightInches, setHeightInches] = useState(
     parseHeight(data.height).inches || "0",
   );
-
-  const genderOptions = ["Man", "Woman", "Non-binary", "Prefer not to say"];
-  const lookingForOptions = ["Men", "Women", "Everyone"];
-  const datingPreferenceOptions = [
-    "Long-term relationship",
-    "Short-term fun",
-    "Figuring it out",
-    "New friends",
-  ];
-  const feetOptions = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-  const inchesOptions = [
-    "0",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-    "11",
-  ];
 
   const updateHeight = (feet: string, inches: string) => {
     if (feet && inches) {
@@ -103,8 +89,8 @@ const BasicIdentityScreen = () => {
         <ProgressBar totalSteps={3} currentStep={1} />
         <View style={styles.headerSpacer} />
         <EditorialHeader
-          title="THE_FOUNDATION"
-          subtitle="Initialize your profile parameters."
+          title={CONSTANTS.title}
+          subtitle={CONSTANTS.subtitle}
         />
       </View>
 
@@ -118,13 +104,15 @@ const BasicIdentityScreen = () => {
         >
           {/* Identification Block */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>IDENTIFICATION</Text>
+            <Text style={styles.sectionLabel}>
+              {CONSTANTS.sections.identification}
+            </Text>
             <View style={styles.formGroup}>
               <View style={styles.row}>
                 <View style={{ flex: 1 }}>
                   <TextInput
-                    label="FIRST NAME"
-                    placeholder="E.g. John"
+                    label={CONSTANTS.fields.firstName.label}
+                    placeholder={CONSTANTS.fields.firstName.placeholder}
                     value={data.firstName}
                     onChangeText={(text) => updateData({ firstName: text })}
                     error={errors.firstName}
@@ -133,8 +121,8 @@ const BasicIdentityScreen = () => {
                 </View>
                 <View style={{ flex: 1 }}>
                   <TextInput
-                    label="LAST NAME"
-                    placeholder="E.g. Doe"
+                    label={CONSTANTS.fields.lastName.label}
+                    placeholder={CONSTANTS.fields.lastName.placeholder}
                     value={data.lastName}
                     onChangeText={(text) => updateData({ lastName: text })}
                     error={errors.lastName}
@@ -147,30 +135,30 @@ const BasicIdentityScreen = () => {
 
           {/* Vitals Block */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>VITALS & SPECS</Text>
+            <Text style={styles.sectionLabel}>{CONSTANTS.sections.vitals}</Text>
             <View style={styles.formGroup}>
               <DatePicker
-                label="DATE OF BIRTH"
+                label={CONSTANTS.fields.dob.label}
                 value={data.dateOfBirth}
                 onChange={(date) => updateData({ dateOfBirth: date })}
                 error={errors.dateOfBirth}
               />
 
               <Dropdown
-                label="GENDER"
+                label={CONSTANTS.fields.gender.label}
                 value={data.gender}
-                options={genderOptions}
+                options={GENDER_OPTIONS}
                 onChange={(value) => updateData({ gender: value as any })}
-                placeholder="Select"
+                placeholder={CONSTANTS.fields.gender.placeholder}
                 error={errors.gender}
               />
 
               <View style={styles.heightRow}>
                 <View style={{ flex: 1 }}>
                   <Dropdown
-                    label="HEIGHT (FT)"
+                    label={`${CONSTANTS.fields.height.label} (${CONSTANTS.fields.heightFt.label})`}
                     value={heightFeet}
-                    options={feetOptions}
+                    options={FEET_OPTIONS}
                     onChange={(value) => {
                       setHeightFeet(value);
                       updateHeight(value, heightInches);
@@ -181,9 +169,9 @@ const BasicIdentityScreen = () => {
                 </View>
                 <View style={{ flex: 1 }}>
                   <Dropdown
-                    label="HEIGHT (IN)"
+                    label={`${CONSTANTS.fields.height.label} (${CONSTANTS.fields.heightIn.label})`}
                     value={heightInches}
-                    options={inchesOptions}
+                    options={INCHES_OPTIONS}
                     onChange={(value) => {
                       setHeightInches(value);
                       updateHeight(heightFeet, value);
@@ -198,22 +186,22 @@ const BasicIdentityScreen = () => {
               </View>
 
               <Dropdown
-                label="INTERESTED IN"
+                label={CONSTANTS.fields.lookingFor.label}
                 value={data.lookingFor}
-                options={lookingForOptions}
+                options={LOOKING_FOR_OPTIONS}
                 onChange={(value) => updateData({ lookingFor: value as any })}
-                placeholder="Select preference"
+                placeholder={CONSTANTS.fields.lookingFor.placeholder}
                 error={errors.lookingFor}
               />
 
               <Dropdown
-                label="DATING PREFERENCE"
+                label={CONSTANTS.fields.datingPref.label}
                 value={data.datingPreference}
-                options={datingPreferenceOptions}
+                options={DATING_PREFERENCE_OPTIONS}
                 onChange={(value) =>
                   updateData({ datingPreference: value as any })
                 }
-                placeholder="What are you looking for?"
+                placeholder={CONSTANTS.fields.datingPref.placeholder}
                 error={errors.datingPreference}
               />
             </View>
@@ -221,27 +209,29 @@ const BasicIdentityScreen = () => {
 
           {/* Background Block */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>BACKGROUND</Text>
+            <Text style={styles.sectionLabel}>
+              {CONSTANTS.sections.background}
+            </Text>
             <View style={styles.formGroup}>
               <TextInput
-                label="CURRENT LOCATION"
-                placeholder="City, Country"
+                label={CONSTANTS.fields.location.label}
+                placeholder={CONSTANTS.fields.location.placeholder}
                 value={data.location}
                 onChangeText={(text) => updateData({ location: text })}
                 error={errors.location}
                 autoCapitalize="words"
               />
               <TextInput
-                label="JOB TITLE"
-                placeholder="E.g. Architect"
+                label={CONSTANTS.fields.job.label}
+                placeholder={CONSTANTS.fields.job.placeholder}
                 value={data.jobTitle}
                 onChangeText={(text) => updateData({ jobTitle: text })}
                 error={errors.jobTitle}
                 autoCapitalize="words"
               />
               <TextInput
-                label="DEGREE / SCHOOL"
-                placeholder="E.g. IIT Tech"
+                label={CONSTANTS.fields.school.label}
+                placeholder={CONSTANTS.fields.school.placeholder}
                 value={data.school}
                 onChangeText={(text) => updateData({ school: text })}
                 error={errors.school}
@@ -252,13 +242,11 @@ const BasicIdentityScreen = () => {
 
           <View style={styles.buttonContainer}>
             <CTA_BTN
-              text="INITIALIZE PROFILE"
+              text={CONSTANTS.nextBtn}
               onPress={handleContinue}
               btnColor={colors.primary}
             />
-            <Text style={styles.infoText}>
-              You must be at least 18 to join this community.
-            </Text>
+            <Text style={styles.infoText}>{CONSTANTS.ageNote}</Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

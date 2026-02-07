@@ -4,6 +4,7 @@ import ImageUpload from "@/components/ui/ImageUpload";
 import ProgressBar from "@/components/ui/ProgressBar";
 import PromptModal from "@/components/ui/PromptModal";
 import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
+import { MICROCOPY } from "@/constants/microcopies";
 import { useOnboarding } from "@/context/OnboardingContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -19,6 +20,8 @@ const ProfileBuilderScreen = () => {
   const [error, setError] = useState("");
   const [isPromptModalVisible, setIsPromptModalVisible] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
+
+  const CONSTANTS = MICROCOPY.onboarding.profileBuilder;
 
   const handleImageSelect = (uris: string[], startIndex: number) => {
     const newImages = [...data.images];
@@ -55,7 +58,7 @@ const ProfileBuilderScreen = () => {
   const validateForm = () => {
     const uploadedImages = data.images.filter((img) => img !== undefined);
     if (uploadedImages.length < 2) {
-      setError("Add at least 2 photos to stand out.");
+      setError(CONSTANTS.error);
       return false;
     }
     return true;
@@ -75,8 +78,8 @@ const ProfileBuilderScreen = () => {
         <ProgressBar totalSteps={3} currentStep={3} />
         <View style={styles.headerSpacer} />
         <EditorialHeader
-          title="VISUAL_IDENTITY"
-          subtitle="Curate your visual presence."
+          title={CONSTANTS.title}
+          subtitle={CONSTANTS.subtitle}
         />
       </View>
 
@@ -129,29 +132,30 @@ const ProfileBuilderScreen = () => {
         <View style={styles.statusRow}>
           <View style={styles.tapeTag}>
             <Text style={styles.tapeText}>
-              {uploadedCount}/6 SLOTS UPLOADED
+              {uploadedCount}/6 {CONSTANTS.uploaded}
             </Text>
           </View>
         </View>
 
         <View style={styles.guideContainer}>
-          <Text style={styles.guideTitle}>THE BLUEPRINT</Text>
+          <Text style={styles.guideTitle}>{CONSTANTS.guide.title}</Text>
           <View style={styles.guideGrid}>
-            <Text style={styles.guideItem}>• High Clarity</Text>
-            <Text style={styles.guideItem}>• Solo Shots</Text>
-            <Text style={styles.guideItem}>• Natural Light</Text>
-            <Text style={styles.guideItem}>• Recent</Text>
+            {CONSTANTS.guide.items.map((item, index) => (
+              <Text key={index} style={styles.guideItem}>
+                • {item}
+              </Text>
+            ))}
           </View>
         </View>
 
         <View style={styles.buttonContainer}>
           <CTA_BTN
-            text="FINALIZE PROFILE"
+            text={CONSTANTS.finishBtn}
             onPress={handleComplete}
             btnColor={colors.primary}
           />
           <Text style={styles.backLink} onPress={() => router.back()}>
-            GO BACK
+            {CONSTANTS.backBtn}
           </Text>
         </View>
       </ScrollView>

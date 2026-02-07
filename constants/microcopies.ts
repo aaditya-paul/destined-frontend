@@ -124,4 +124,90 @@ export const MICROCOPY = {
     report: "Context helps us act fairly.",
     delete: "No hard feelings.",
   },
+
+  onboarding: {
+    basicIdentity: {
+      title: "THE BASICS",
+      subtitle: "Let's get you set up.",
+      sections: {
+        identification: "WHO ARE YOU?",
+        vitals: "THE DEETS",
+        background: "CONTEXT",
+      },
+      fields: {
+        firstName: { label: "FIRST NAME", placeholder: "Aaditya" },
+        lastName: { label: "LAST NAME", placeholder: "Paul" },
+        dob: { label: "BDAY" },
+        gender: { label: "GENDER", placeholder: "Select" },
+        height: { label: "HEIGHT" },
+        heightFt: { label: "FT" },
+        heightIn: { label: "IN" },
+        lookingFor: {
+          label: "INTERESTED IN",
+          placeholder: "Select preference",
+        },
+        datingPref: { label: "VIBE", placeholder: "What's the move?" },
+        location: { label: "WHERE U AT?", placeholder: "City, Country" },
+        job: { label: "WHAT DO U DO?", placeholder: "Hustle / Job" },
+        school: { label: "EDUCATION", placeholder: "College / Uni" },
+      },
+      nextBtn: "CONTINUE",
+      ageNote: "You must be at least 18 to join this community.",
+    },
+    bioInterests: {
+      title: "VIBE CHECK",
+      subtitle: "Pass the vibe check.",
+      bio: {
+        label: "BIO",
+        placeholder: "Yap session starts here... (keep it real)",
+      },
+      interests: {
+        label: "YOUR INTERESTS",
+        error: "SELECT AT LEAST 3 ATTRIBUTES.",
+      },
+      audio: {
+        label: "VOICE NOTE",
+        heading: "SAY SOMETHING",
+        hint: {
+          default: "TAP TO YAP",
+          recording: "RECORDING...",
+          recorded: "AUDIO CAPTURED",
+        },
+      },
+      mcq: {
+        label: "GUESS GAME",
+        question: {
+          label: "ASK SOMETHING",
+          placeholder: "Bet they can't guess this...",
+        },
+        options: { label: "OPTIONS" },
+        hint: "Mark the answer. Let them guess.",
+      },
+      nextBtn: "CONTINUE",
+      backBtn: "BACK",
+      errors: {
+        bio: "YOUR STORY NEEDS MORE DETAIL (MIN 20 CHARS).",
+        interests: "SELECT AT LEAST 3 ATTRIBUTES.",
+        mcqOptions: "ALL MCQ OPTIONS MUST BE FILLED.",
+        mcqAnswer: "SELECT THE CORRECT ANSWER.",
+      },
+    },
+    profileBuilder: {
+      title: "THE LOOK",
+      subtitle: "Pics or it didn't happen.",
+      uploaded: "UPLOADED",
+      guide: {
+        title: "CHEAT SHEET",
+        items: [
+          "No blurry pics",
+          "Just you pls",
+          "Good lighting",
+          "Not from 2015",
+        ],
+      },
+      finishBtn: "READY",
+      backBtn: "BACK",
+      error: "Add at least 2 photos to stand out.",
+    },
+  },
 };
