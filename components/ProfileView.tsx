@@ -238,7 +238,9 @@ const PollSection = ({
   initialHasAnswered?: boolean;
   onSelectionChange?: (selectedIndex: number, hasAnswered: boolean) => void;
 }) => {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(initialSelectedIndex);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(
+    initialSelectedIndex,
+  );
   const [hasAnswered, setHasAnswered] = useState(initialHasAnswered);
 
   const handleOptionPress = (index: number) => {
@@ -329,7 +331,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     : "";
 
   // Track poll selection state to pass to modal
-  const [pollSelectedIndex, setPollSelectedIndex] = useState<number | null>(null);
+  const [pollSelectedIndex, setPollSelectedIndex] = useState<number | null>(
+    null,
+  );
   const [pollHasAnswered, setPollHasAnswered] = useState(false);
 
   return (
@@ -510,32 +514,34 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         )}
 
         {/* --- SLOT 5: Poll --- */}
-        {profile.poll.question && profile.poll.options.length > 0 && profile.poll.options.every(opt => opt.label.trim()) && (
-          <LikeableCard
-            onLike={() =>
-              onCardLike?.(
-                <PollSection
-                  question={profile.poll.question || "Help me decide?"}
-                  options={profile.poll.options}
-                  correctAnswerIndex={profile.poll.correctAnswerIndex}
-                  disabled={true}
-                  initialSelectedIndex={pollSelectedIndex}
-                  initialHasAnswered={pollHasAnswered}
-                />,
-              )
-            }
-          >
-            <PollSection
-              question={profile.poll.question || "Help me decide?"}
-              options={profile.poll.options}
-              correctAnswerIndex={profile.poll.correctAnswerIndex}
-              onSelectionChange={(selectedIndex, hasAnswered) => {
-                setPollSelectedIndex(selectedIndex);
-                setPollHasAnswered(hasAnswered);
-              }}
-            />
-          </LikeableCard>
-        )}
+        {profile.poll.question &&
+          profile.poll.options.length > 0 &&
+          profile.poll.options.every((opt) => opt.label.trim()) && (
+            <LikeableCard
+              onLike={() =>
+                onCardLike?.(
+                  <PollSection
+                    question={profile.poll.question || "Help me decide?"}
+                    options={profile.poll.options}
+                    correctAnswerIndex={profile.poll.correctAnswerIndex}
+                    disabled={true}
+                    initialSelectedIndex={pollSelectedIndex}
+                    initialHasAnswered={pollHasAnswered}
+                  />,
+                )
+              }
+            >
+              <PollSection
+                question={profile.poll.question || "Help me decide?"}
+                options={profile.poll.options}
+                correctAnswerIndex={profile.poll.correctAnswerIndex}
+                onSelectionChange={(selectedIndex, hasAnswered) => {
+                  setPollSelectedIndex(selectedIndex);
+                  setPollHasAnswered(hasAnswered);
+                }}
+              />
+            </LikeableCard>
+          )}
 
         {/* --- SLOT 6: Image 3 --- */}
         {profile.images[3]?.uri && (
