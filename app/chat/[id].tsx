@@ -3,13 +3,15 @@ import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatInput, ChatInputHandle } from "@/components/chat/ChatInput";
 import { DateSeparator } from "@/components/chat/DateSeparator";
 import { EmojiReactionPicker } from "@/components/chat/EmojiReactionPicker";
+import { FullscreenVideoPlayer } from "@/components/chat/FullscreenVideoPlayer";
+import { MediaCaptionModal } from "@/components/chat/MediaCaptionModal";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { ScrollToBottomButton } from "@/components/chat/ScrollToBottomButton";
 import { SwipeableMessage } from "@/components/chat/SwipeableMessage";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { ZoomableImage } from "@/components/chat/ZoomableImage";
 import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
-import { Message, ReplyRef } from "@/context/types";
+import { MediaItem, Message, ReplyRef } from "@/context/types";
 import { dummyChats } from "@/data/dummyData";
 import {
   buildChatListData,
@@ -61,6 +63,12 @@ export default function ChatScreen() {
   const [highlightedMessageId, setHighlightedMessageId] = useState<
     string | null
   >(null);
+  const [fullScreenVideoUri, setFullScreenVideoUri] = useState<string | null>(
+    null,
+  );
+  const [mediaCaptionModalVisible, setMediaCaptionModalVisible] =
+    useState(false);
+  const [pendingMedia, setPendingMedia] = useState<MediaItem[]>([]);
 
   const flatListRef = useRef<FlatList>(null);
   const inputRef = useRef<ChatInputHandle>(null);
@@ -111,6 +119,12 @@ export default function ChatScreen() {
             break;
           case "image":
             replyText = "📷 Photo";
+            break;
+          case "video":
+            replyText = "🎬 Video";
+            break;
+          case "media":
+            replyText = `📎 ${msg.media?.length ?? 0} items`;
             break;
           default:
             replyText = "Message";
@@ -227,7 +241,7 @@ export default function ChatScreen() {
     }, 100);
   }, [messageText, replyRef]);
 
-  // ── Image Picker ─────────────────────────────────────────────────
+  // ── Image Picker (single quick-send) ─────────────────────────────
   const handleImagePick = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -253,6 +267,109 @@ export default function ChatScreen() {
       }, 100);
     }
   }, []);
+
+  // ── Multi-media Picker (photos + videos) ─────────────────────────
+  const handleMediaPick = useCallback(async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images", "videos"],
+      allowsMultipleSelection: true,
+      quality: 0.8,
+      videoMaxDuration: 120,
+      orderedSelection: true,
+      selectionLimit: 10,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      const items: MediaItem[] = result.assets.map((asset) => ({
+        uri: asset.uri,
+        type: asset.type === "video" ? ("video" as const) : ("image" as const),
+        width: asset.width,
+        height: asset.height,
+        duration: asset.duration ?? undefined,
+      }));
+      setPendingMedia(items);
+      setMediaCaptionModalVisible(true);
+    }
+  }, []);
+
+  // ── Send Media (from caption modal) ──────────────────────────────
+  const handleMediaSend = useCallback(
+    (items: MediaItem[]) => {
+      setMediaCaptionModalVisible(false);
+      setPendingMedia([]);
+
+      if (items.length === 0) return;
+
+      let newMsg: Message;
+
+      if (items.length === 1) {
+        const item = items[0];
+        if (item.type === "video") {
+          newMsg = {
+            id: `vid-${Date.now()}`,
+            text: "",
+            sender: "user",
+            timestamp: new Date(),
+            status: "sent",
+            type: "video",
+            videoUri: item.uri,
+            videoDuration: item.duration,
+            caption: item.caption,
+            ...(replyRef ? { replyTo: replyRef } : {}),
+          };
+        } else {
+          newMsg = {
+            id: `img-${Date.now()}`,
+            text: "",
+            sender: "user",
+            timestamp: new Date(),
+            status: "sent",
+            type: "image",
+            imageUri: item.uri,
+            caption: item.caption,
+            ...(replyRef ? { replyTo: replyRef } : {}),
+          };
+        }
+      } else {
+        newMsg = {
+          id: `media-${Date.now()}`,
+          text: "",
+          sender: "user",
+          timestamp: new Date(),
+          status: "sent",
+          type: "media",
+          media: items,
+          ...(replyRef ? { replyTo: replyRef } : {}),
+        };
+      }
+
+      setMessages((prev) => [...prev, newMsg]);
+      setReplyRef(null);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+      // Simulate delivery
+      setTimeout(() => {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === newMsg.id ? { ...m, status: "delivered" } : m,
+          ),
+        );
+      }, 1500);
+
+      setTimeout(() => {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === newMsg.id ? { ...m, status: "read" } : m,
+          ),
+        );
+      }, 4000);
+
+      setTimeout(() => {
+        flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+      }, 100);
+    },
+    [replyRef],
+  );
 
   const handleCameraPress = useCallback(async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -455,6 +572,15 @@ export default function ChatScreen() {
     setFullScreenImageUri(null);
   }, []);
 
+  // ── Video Viewer ───────────────────────────────────────────────
+  const handleVideoFullscreen = useCallback((uri: string) => {
+    setFullScreenVideoUri(uri);
+  }, []);
+
+  const handleCloseVideoViewer = useCallback(() => {
+    setFullScreenVideoUri(null);
+  }, []);
+
   // ── Render Item ──────────────────────────────────────────────────
   const renderItem = useCallback(
     ({ item }: { item: ChatListItem }) => {
@@ -472,6 +598,7 @@ export default function ChatScreen() {
             onReactionPress={handleReactionPress}
             onReplyPress={handleReplyPress}
             onImagePress={handleImagePress}
+            onVideoPress={handleVideoFullscreen}
           />
         </SwipeableMessage>
       );
@@ -482,6 +609,7 @@ export default function ChatScreen() {
       handleReactionPress,
       handleReplyPress,
       handleImagePress,
+      handleVideoFullscreen,
       highlightedMessageId,
     ],
   );
@@ -615,6 +743,7 @@ export default function ChatScreen() {
             onSend={handleSend}
             onCameraPress={handleCameraPress}
             onImagePress={handleImagePick}
+            onMediaPress={handleMediaPick}
             onVoiceSend={handleVoiceSend}
             replyRef={replyRef}
             onCancelReply={handleCancelReply}
@@ -669,6 +798,33 @@ export default function ChatScreen() {
             {fullScreenImageUri && <ZoomableImage uri={fullScreenImageUri} />}
           </GestureHandlerRootView>
         </Modal>
+
+        {/* Full-screen Video Player */}
+        <Modal
+          visible={fullScreenVideoUri !== null}
+          transparent
+          animationType="fade"
+          statusBarTranslucent
+          onRequestClose={handleCloseVideoViewer}
+        >
+          {fullScreenVideoUri && (
+            <FullscreenVideoPlayer
+              uri={fullScreenVideoUri}
+              onClose={handleCloseVideoViewer}
+            />
+          )}
+        </Modal>
+
+        {/* Media Caption Modal (multi-select review) */}
+        <MediaCaptionModal
+          visible={mediaCaptionModalVisible}
+          media={pendingMedia}
+          onSend={handleMediaSend}
+          onCancel={() => {
+            setMediaCaptionModalVisible(false);
+            setPendingMedia([]);
+          }}
+        />
       </SafeAreaView>
     </GestureHandlerRootView>
   );

@@ -51,14 +51,33 @@ export interface ReplyRef {
   senderName: string;
 }
 
+/** A single image or video inside a message. */
+export interface MediaItem {
+  uri: string;
+  type: "image" | "video";
+  caption?: string;
+  /** Width in pixels (when available from picker). */
+  width?: number;
+  /** Height in pixels (when available from picker). */
+  height?: number;
+  /** Duration in seconds (video only). */
+  duration?: number;
+}
+
 export interface Message {
   id: string;
   text: string;
   sender: "user" | "them";
   timestamp: Date;
   status?: "sent" | "delivered" | "read";
-  type?: "text" | "image" | "voice";
+  type?: "text" | "image" | "voice" | "video" | "media";
   imageUri?: string;
+  videoUri?: string;
+  videoDuration?: number; // seconds
+  /** Grouped media (photos + videos in one message). */
+  media?: MediaItem[];
+  /** Caption for a single-media message (kept for backwards compat). */
+  caption?: string;
   voiceUri?: string;
   voiceDuration?: number; // seconds
   replyTo?: ReplyRef;

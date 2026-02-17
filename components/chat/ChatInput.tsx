@@ -27,6 +27,8 @@ interface Props {
   onSend: () => void;
   onCameraPress?: () => void;
   onImagePress?: () => void;
+  /** Opens multi-select media picker (images + videos). */
+  onMediaPress?: () => void;
   onVoiceSend?: (uri: string, duration: number) => void;
   replyRef?: ReplyRef | null;
   onCancelReply?: () => void;
@@ -44,6 +46,7 @@ export const ChatInput = React.forwardRef<ChatInputHandle, Props>(
       onSend,
       onCameraPress,
       onImagePress,
+      onMediaPress,
       onVoiceSend,
       replyRef,
       onCancelReply,
@@ -257,7 +260,7 @@ export const ChatInput = React.forwardRef<ChatInputHandle, Props>(
               />
             </Pressable>
 
-            {/* Gallery */}
+            {/* Gallery (single image) */}
             <Pressable
               style={({ pressed }) => [
                 styles.iconButton,
@@ -272,6 +275,24 @@ export const ChatInput = React.forwardRef<ChatInputHandle, Props>(
                 color={colors.textSecondary}
               />
             </Pressable>
+
+            {/* Multi-media picker (images + videos) */}
+            {onMediaPress && (
+              <Pressable
+                style={({ pressed }) => [
+                  styles.iconButton,
+                  pressed && styles.iconPressed,
+                ]}
+                onPress={onMediaPress}
+                hitSlop={8}
+              >
+                <Ionicons
+                  name="albums-outline"
+                  size={22}
+                  color={colors.textSecondary}
+                />
+              </Pressable>
+            )}
 
             {/* Text Input */}
             <View style={styles.inputWrapper}>

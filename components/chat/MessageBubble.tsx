@@ -11,6 +11,8 @@ import {
   Text,
   View,
 } from "react-native";
+import { MediaGroup } from "./MediaGroup";
+import { VideoPlayerBubble } from "./VideoPlayerBubble";
 import { VoiceMessageBubble } from "./VoiceMessageBubble";
 
 interface Props {
@@ -22,6 +24,7 @@ interface Props {
   onReactionPress?: (message: Message, emoji: string) => void;
   onReplyPress?: (messageId: string) => void;
   onImagePress?: (uri: string) => void;
+  onVideoPress?: (uri: string) => void;
 }
 
 const RADIUS = 20;
@@ -36,6 +39,7 @@ export const MessageBubble: React.FC<Props> = ({
   onReactionPress,
   onReplyPress,
   onImagePress,
+  onVideoPress,
 }) => {
   const isUser = message.sender === "user";
   const isDeleted = message.isDeleted === true;
@@ -235,13 +239,57 @@ export const MessageBubble: React.FC<Props> = ({
 
           {/* Image message */}
           {message.type === "image" && message.imageUri && (
-            <Pressable onPress={() => onImagePress?.(message.imageUri!)}>
-              <Image
-                source={{ uri: message.imageUri }}
-                style={styles.image}
-                resizeMode="cover"
+            <View>
+              <Pressable onPress={() => onImagePress?.(message.imageUri!)}>
+                <Image
+                  source={{ uri: message.imageUri }}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+              </Pressable>
+              {message.caption ? (
+                <Text
+                  style={[
+                    styles.captionText,
+                    isUser ? styles.userText : styles.themText,
+                  ]}
+                >
+                  {message.caption}
+                </Text>
+              ) : null}
+            </View>
+          )}
+
+          {/* Video message */}
+          {message.type === "video" && message.videoUri && (
+            <View>
+              <VideoPlayerBubble
+                videoUri={message.videoUri}
+                duration={message.videoDuration}
+                isUser={isUser}
+                onFullscreen={onVideoPress}
               />
-            </Pressable>
+              {message.caption ? (
+                <Text
+                  style={[
+                    styles.captionText,
+                    isUser ? styles.userText : styles.themText,
+                  ]}
+                >
+                  {message.caption}
+                </Text>
+              ) : null}
+            </View>
+          )}
+
+          {/* Grouped media (multi-select) */}
+          {message.type === "media" && message.media && (
+            <MediaGroup
+              media={message.media}
+              isUser={isUser}
+              onImagePress={onImagePress}
+              onVideoPress={onVideoPress}
+            />
           )}
 
           {/* Voice message */}
@@ -450,5 +498,13 @@ const styles = StyleSheet.create({
   },
   themTime: {
     color: colors.textSecondary,
+  },
+  captionText: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: fontFamilies.primary.regular,
+    marginTop: 4,
+    marginBottom: 2,
+    paddingHorizontal: 2,
   },
 });
