@@ -66,6 +66,7 @@ const ProfileBuilderScreen = () => {
 
   const handleComplete = () => {
     if (validateForm()) {
+      router.dismissAll();
       router.replace("/(tabs)/home");
     }
   };

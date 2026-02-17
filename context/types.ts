@@ -40,11 +40,28 @@ export interface OnboardingData {
   receivedCompliment?: string;
 }
 
+export interface MessageReaction {
+  emoji: string;
+  sender: "user" | "them";
+}
+
+export interface ReplyRef {
+  id: string;
+  text: string;
+  senderName: string;
+}
+
 export interface Message {
   id: string;
   text: string;
   sender: "user" | "them";
   timestamp: Date;
+  status?: "sent" | "delivered" | "read";
+  type?: "text" | "image" | "voice";
+  imageUri?: string;
+  replyTo?: ReplyRef;
+  reactions?: MessageReaction[];
+  isDeleted?: boolean;
 }
 
 export interface Chat {
@@ -52,7 +69,11 @@ export interface Chat {
   user: OnboardingData;
   lastMessage: string;
   unread: boolean;
+  unreadCount?: number;
   messages: Message[];
+  isTyping?: boolean;
+  isOnline?: boolean;
+  lastActive?: Date;
 }
 
 export interface ImageItem {

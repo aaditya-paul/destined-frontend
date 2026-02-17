@@ -228,56 +228,374 @@ export const dummyProfiles: OnboardingData[] = [
   },
 ];
 
+// ─── Time helpers for dummy data ─────────────────────────────────────
+const MINUTE = 60 * 1000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const NOW = Date.now();
+
 export const dummyChats: Chat[] = [
+  // ── Chat 1: Jessica – Online, Typing, Unread ──────────────────────
   {
     id: "1",
-    user: dummyProfiles[1], // Jessica
-    lastMessage: "Omg yes! FF7 Remake was so good.",
+    user: dummyProfiles[1],
+    lastMessage: "Omg yes! FF7 Remake was incredible 🎮",
     unread: true,
+    unreadCount: 2,
+    isTyping: true,
+    isOnline: true,
     messages: [
+      // Yesterday
       {
-        id: "m1",
+        id: "j1",
         text: "Finally someone who appreciates Final Fantasy!",
         sender: "them",
-        timestamp: new Date(Date.now() - 86400000),
+        timestamp: new Date(NOW - 1 * DAY - 5 * HOUR),
+        status: "read",
       },
       {
-        id: "m2",
-        text: "Haha right? It's a classic.",
+        id: "j2",
+        text: "Haha right? It's literally a masterpiece",
         sender: "user",
-        timestamp: new Date(Date.now() - 80000000),
+        timestamp: new Date(NOW - 1 * DAY - 4.5 * HOUR),
+        status: "read",
       },
       {
-        id: "m3",
-        text: "Omg yes! FF7 Remake was so good.",
+        id: "j3",
+        text: "Which one's your favorite?",
+        sender: "user",
+        timestamp: new Date(NOW - 1 * DAY - 4.5 * HOUR + MINUTE),
+        status: "read",
+      },
+      {
+        id: "j4",
+        text: "Ok don't judge me... FF10 😅",
         sender: "them",
-        timestamp: new Date(Date.now() - 1000 * 60 * 5), // 5 mins ago
+        timestamp: new Date(NOW - 1 * DAY - 4 * HOUR),
+        status: "read",
+      },
+      {
+        id: "j5",
+        text: "Tidus and Yuna's story is elite tbh",
+        sender: "them",
+        timestamp: new Date(NOW - 1 * DAY - 4 * HOUR + MINUTE),
+        status: "read",
+      },
+      {
+        id: "j6",
+        text: "No judgment! That ending scene still hits hard",
+        sender: "user",
+        timestamp: new Date(NOW - 1 * DAY - 3.5 * HOUR),
+        status: "read",
+      },
+      // Today
+      {
+        id: "j7",
+        text: "Have you played the FF7 Rebirth yet??",
+        sender: "them",
+        timestamp: new Date(NOW - 3 * HOUR),
+        status: "read",
+      },
+      {
+        id: "j8",
+        text: "Not yet! Been meaning to. Is it good?",
+        sender: "user",
+        timestamp: new Date(NOW - 2.5 * HOUR),
+        status: "read",
+      },
+      {
+        id: "j9",
+        text: "Omg yes! FF7 Remake was incredible 🎮",
+        sender: "them",
+        timestamp: new Date(NOW - 8 * MINUTE),
+      },
+      {
+        id: "j10",
+        text: "Rebirth takes it to a whole other level",
+        sender: "them",
+        timestamp: new Date(NOW - 5 * MINUTE),
       },
     ],
   },
+
+  // ── Chat 2: Maya – Online, No unread ──────────────────────────────
   {
     id: "2",
-    user: dummyProfiles[3], // Maya
-    lastMessage: "I'll send you the playlist!",
+    user: dummyProfiles[3],
+    lastMessage: "I'll send you the playlist! 🎵",
     unread: false,
+    unreadCount: 0,
+    isOnline: true,
     messages: [
+      // 2 days ago
       {
-        id: "m1",
-        text: "K-pop and coding? We might be soulmates.",
+        id: "ma1",
+        text: "K-pop and coding? We might be soulmates 😂",
         sender: "them",
-        timestamp: new Date(Date.now() - 172800000),
+        timestamp: new Date(NOW - 2 * DAY - 3 * HOUR),
+        status: "read",
       },
       {
-        id: "m2",
-        text: "Haha I try my best! What groups do you like?",
+        id: "ma2",
+        text: "Haha I try my best! What groups do you listen to?",
         sender: "user",
-        timestamp: new Date(Date.now() - 170000000),
+        timestamp: new Date(NOW - 2 * DAY - 2.5 * HOUR),
+        status: "read",
       },
       {
-        id: "m3",
-        text: "I'll send you the playlist!",
+        id: "ma3",
+        text: "BTS obviously, but also NewJeans and aespa",
         sender: "them",
-        timestamp: new Date(Date.now() - 3600000), // 1 hour ago
+        timestamp: new Date(NOW - 2 * DAY - 2 * HOUR),
+        status: "read",
+      },
+      {
+        id: "ma4",
+        text: "NewJeans are so good! Super Shy is on repeat",
+        sender: "user",
+        timestamp: new Date(NOW - 2 * DAY - 1.5 * HOUR),
+        status: "read",
+      },
+      // Yesterday
+      {
+        id: "ma5",
+        text: "Ok I made a playlist of all the best K-pop tracks",
+        sender: "them",
+        timestamp: new Date(NOW - 1 * DAY - 6 * HOUR),
+        status: "read",
+      },
+      {
+        id: "ma6",
+        text: "Including some underrated gems 💎",
+        sender: "them",
+        timestamp: new Date(NOW - 1 * DAY - 6 * HOUR + MINUTE),
+        status: "read",
+      },
+      {
+        id: "ma7",
+        text: "Yesss please share! I need new music",
+        sender: "user",
+        timestamp: new Date(NOW - 1 * DAY - 5 * HOUR),
+        status: "read",
+      },
+      // Today
+      {
+        id: "ma8",
+        text: "I'll send you the playlist! 🎵",
+        sender: "them",
+        timestamp: new Date(NOW - 1 * HOUR),
+        status: "read",
+      },
+      {
+        id: "ma9",
+        text: "Can't wait!",
+        sender: "user",
+        timestamp: new Date(NOW - 50 * MINUTE),
+        status: "delivered",
+      },
+    ],
+  },
+
+  // ── Chat 3: Sarah – Offline, No unread, Long conversation ─────────
+  {
+    id: "3",
+    user: dummyProfiles[0],
+    lastMessage: "Absolutely! Saturday morning works 🥾",
+    unread: false,
+    unreadCount: 0,
+    isOnline: false,
+    lastActive: new Date(NOW - 3 * HOUR),
+    messages: [
+      // 3 days ago
+      {
+        id: "s1",
+        text: "Your hiking photos are amazing! Where was that?",
+        sender: "them",
+        timestamp: new Date(NOW - 3 * DAY - 8 * HOUR),
+        status: "read",
+      },
+      {
+        id: "s2",
+        text: "Thanks! That was Breakneck Ridge, about an hour north of the city",
+        sender: "user",
+        timestamp: new Date(NOW - 3 * DAY - 7.5 * HOUR),
+        status: "read",
+      },
+      {
+        id: "s3",
+        text: "I've been wanting to go there forever!",
+        sender: "them",
+        timestamp: new Date(NOW - 3 * DAY - 7 * HOUR),
+        status: "read",
+      },
+      {
+        id: "s4",
+        text: "It's gorgeous. The scramble section is intense though 😅",
+        sender: "user",
+        timestamp: new Date(NOW - 3 * DAY - 6.5 * HOUR),
+        status: "read",
+      },
+      // 2 days ago
+      {
+        id: "s5",
+        text: "I love a good challenge! Any other trails you'd recommend?",
+        sender: "them",
+        timestamp: new Date(NOW - 2 * DAY - 4 * HOUR),
+        status: "read",
+      },
+      {
+        id: "s6",
+        text: "Harriman State Park is great for a full day trip",
+        sender: "user",
+        timestamp: new Date(NOW - 2 * DAY - 3.5 * HOUR),
+        status: "read",
+      },
+      {
+        id: "s7",
+        text: "And Bear Mountain if you want something easier but still scenic",
+        sender: "user",
+        timestamp: new Date(NOW - 2 * DAY - 3.5 * HOUR + MINUTE),
+        status: "read",
+      },
+      {
+        id: "s8",
+        text: "We should totally plan a hike together!",
+        sender: "them",
+        timestamp: new Date(NOW - 2 * DAY - 3 * HOUR),
+        status: "read",
+      },
+      // Yesterday
+      {
+        id: "s9",
+        text: "I'm so down! When are you free?",
+        sender: "user",
+        timestamp: new Date(NOW - 1 * DAY - 6 * HOUR),
+        status: "read",
+      },
+      {
+        id: "s10",
+        text: "This weekend maybe? Saturday morning?",
+        sender: "them",
+        timestamp: new Date(NOW - 1 * DAY - 5 * HOUR),
+        status: "read",
+      },
+      {
+        id: "s11",
+        text: "Absolutely! Saturday morning works 🥾",
+        sender: "user",
+        timestamp: new Date(NOW - 1 * DAY - 4.5 * HOUR),
+        status: "read",
+      },
+    ],
+  },
+
+  // ── Chat 4: Emily – Offline recently, 1 unread ────────────────────
+  {
+    id: "4",
+    user: dummyProfiles[2],
+    lastMessage: "Surpriseee 🎉 I found the best taco spot",
+    unread: true,
+    unreadCount: 1,
+    isOnline: false,
+    lastActive: new Date(NOW - 45 * MINUTE),
+    messages: [
+      // Today
+      {
+        id: "e1",
+        text: "Love the sarcasm in your bio haha",
+        sender: "them",
+        timestamp: new Date(NOW - 6 * HOUR),
+        status: "read",
+      },
+      {
+        id: "e2",
+        text: "Sarcasm is my love language 😏",
+        sender: "user",
+        timestamp: new Date(NOW - 5.5 * HOUR),
+        status: "read",
+      },
+      {
+        id: "e3",
+        text: "Same! So what's your go-to spontaneous adventure?",
+        sender: "them",
+        timestamp: new Date(NOW - 5 * HOUR),
+        status: "read",
+      },
+      {
+        id: "e4",
+        text: "Driving to a random town and finding the best food spot",
+        sender: "user",
+        timestamp: new Date(NOW - 4.5 * HOUR),
+        status: "read",
+      },
+      {
+        id: "e5",
+        text: "Ok but that's literally my thing too",
+        sender: "them",
+        timestamp: new Date(NOW - 4 * HOUR),
+        status: "read",
+      },
+      {
+        id: "e6",
+        text: "We might need to test this theory then 🗺️",
+        sender: "user",
+        timestamp: new Date(NOW - 3.5 * HOUR),
+        status: "delivered",
+      },
+      {
+        id: "e7",
+        text: "Surpriseee 🎉 I found the best taco spot",
+        sender: "them",
+        timestamp: new Date(NOW - 30 * MINUTE),
+      },
+    ],
+  },
+
+  // ── Chat 5: Olivia – Offline, Old conversation ────────────────────
+  {
+    id: "5",
+    user: dummyProfiles[4],
+    lastMessage: "Your playlist must be fire 🔥",
+    unread: false,
+    unreadCount: 0,
+    isOnline: false,
+    lastActive: new Date(NOW - 2 * DAY),
+    messages: [
+      // 3 days ago
+      {
+        id: "o1",
+        text: "Your playlist must be fire 🔥",
+        sender: "them",
+        timestamp: new Date(NOW - 3 * DAY - 2 * HOUR),
+        status: "read",
+      },
+      {
+        id: "o2",
+        text: "Haha it's a mix of everything honestly",
+        sender: "user",
+        timestamp: new Date(NOW - 3 * DAY - 1.5 * HOUR),
+        status: "read",
+      },
+      {
+        id: "o3",
+        text: "Love that! I need good workout playlists",
+        sender: "them",
+        timestamp: new Date(NOW - 3 * DAY - 1 * HOUR),
+        status: "read",
+      },
+      {
+        id: "o4",
+        text: "I'll put one together for you! What's your vibe?",
+        sender: "user",
+        timestamp: new Date(NOW - 3 * DAY - 45 * MINUTE),
+        status: "read",
+      },
+      {
+        id: "o5",
+        text: "Anything high energy! EDM, hip hop, pop",
+        sender: "them",
+        timestamp: new Date(NOW - 3 * DAY - 30 * MINUTE),
+        status: "read",
       },
     ],
   },
@@ -286,4 +604,5 @@ export const dummyChats: Chat[] = [
 export const dummyNewMatches: OnboardingData[] = [
   dummyProfiles[4], // Olivia
   dummyProfiles[2], // Emily
+  dummyProfiles[0], // Sarah
 ];
