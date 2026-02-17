@@ -56,7 +56,11 @@ export const MediaGroup: React.FC<Props> = ({
       />
       {item.type === "video" && (
         <View style={styles.videoOverlay}>
-          <Ionicons name="play-circle" size={28} color="rgba(255,255,255,0.9)" />
+          <Ionicons
+            name="play-circle"
+            size={28}
+            color="rgba(255,255,255,0.9)"
+          />
           {item.duration != null && (
             <Text style={styles.videoDur}>
               {Math.floor(item.duration / 60)}:
@@ -131,13 +135,7 @@ export const MediaGroup: React.FC<Props> = ({
   return (
     <View style={[styles.container, styles.grid]}>
       {display.map((item, i) =>
-        renderItem(
-          item,
-          cellW,
-          cellH,
-          i,
-          i === 3 ? overflow : undefined,
-        ),
+        renderItem(item, cellW, cellH, i, i === 3 ? overflow : undefined),
       )}
     </View>
   );

@@ -130,16 +130,10 @@ export const FullscreenVideoPlayer: React.FC<Props> = ({ uri, onClose }) => {
             >
               <View style={styles.seekBarBg}>
                 <View
-                  style={[
-                    styles.seekBarFill,
-                    { width: `${progress * 100}%` },
-                  ]}
+                  style={[styles.seekBarFill, { width: `${progress * 100}%` }]}
                 />
                 <View
-                  style={[
-                    styles.seekThumb,
-                    { left: `${progress * 100}%` },
-                  ]}
+                  style={[styles.seekThumb, { left: `${progress * 100}%` }]}
                 />
               </View>
             </Pressable>

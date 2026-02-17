@@ -1,6 +1,6 @@
 import { colors, fontFamilies } from "@/constants/globalStyles";
 import { Ionicons } from "@expo/vector-icons";
-import { AVPlaybackStatus, Video, ResizeMode } from "expo-av";
+import { AVPlaybackStatus, ResizeMode, Video } from "expo-av";
 import React, { useCallback, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 

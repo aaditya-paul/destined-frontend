@@ -358,9 +358,7 @@ export default function ChatScreen() {
 
       setTimeout(() => {
         setMessages((prev) =>
-          prev.map((m) =>
-            m.id === newMsg.id ? { ...m, status: "read" } : m,
-          ),
+          prev.map((m) => (m.id === newMsg.id ? { ...m, status: "read" } : m)),
         );
       }, 4000);
 
