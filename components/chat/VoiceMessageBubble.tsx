@@ -1,9 +1,11 @@
 import { colors, fontFamilies } from "@/constants/globalStyles";
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av";
+import { Audio, AVPlaybackStatus } from "expo-av";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  GestureResponderEvent,
+  LayoutChangeEvent,
   Pressable,
   StyleSheet,
   Text,
@@ -47,6 +49,7 @@ const WAVEFORM_BARS = 28;
 const BAR_WIDTH = 3;
 const BAR_GAP = 2;
 const MAX_BAR_HEIGHT = 24;
+const SPEED_OPTIONS = [1, 1.5, 2];
 
 export const VoiceMessageBubble: React.FC<Props> = ({
   voiceUri,
@@ -57,63 +60,78 @@ export const VoiceMessageBubble: React.FC<Props> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0); // 0-1
   const [currentTime, setCurrentTime] = useState(0);
+  const [totalDuration, setTotalDuration] = useState(duration);
+  const [speedIndex, setSpeedIndex] = useState(0);
+  const [waveformWidth, setWaveformWidth] = useState(0);
+
   const soundRef = useRef<Audio.Sound | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isPlayingRef = useRef(false);
 
   const waveform = generateWaveform(voiceUri || "default", WAVEFORM_BARS);
+  const currentSpeed = SPEED_OPTIONS[speedIndex];
+
+  // Keep ref in sync with state to avoid stale closures
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (soundRef.current) {
+        soundRef.current.setOnPlaybackStatusUpdate(null);
         soundRef.current.unloadAsync();
-      }
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+        soundRef.current = null;
       }
     };
   }, []);
 
-  const startProgressTracking = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(async () => {
-      if (soundRef.current) {
-        const status = await soundRef.current.getStatusAsync();
-        if (status.isLoaded) {
-          const pos = status.positionMillis / 1000;
-          const dur = (status.durationMillis ?? duration * 1000) / 1000;
-          setCurrentTime(pos);
-          setProgress(dur > 0 ? pos / dur : 0);
+  /**
+   * Single source of truth for playback state updates.
+   * Replaces the old interval-based polling that caused the play/stop/play bug.
+   */
+  const onPlaybackStatusUpdate = useCallback(
+    (status: AVPlaybackStatus) => {
+      if (!status.isLoaded) return;
 
-          if (status.didJustFinish) {
-            setIsPlaying(false);
-            setProgress(0);
-            setCurrentTime(0);
-            if (intervalRef.current) clearInterval(intervalRef.current);
-          }
-        }
+      const dur = (status.durationMillis ?? duration * 1000) / 1000;
+      const pos = status.positionMillis / 1000;
+
+      if (dur > 0) setTotalDuration(dur);
+      setCurrentTime(pos);
+      setProgress(dur > 0 ? pos / dur : 0);
+
+      if (status.didJustFinish) {
+        setIsPlaying(false);
+        setProgress(0);
+        setCurrentTime(0);
       }
-    }, 100);
-  }, [duration]);
+    },
+    [duration],
+  );
 
   const handlePlayPause = useCallback(async () => {
     try {
+      // ── Pause ──
       if (isPlaying && soundRef.current) {
         await soundRef.current.pauseAsync();
         setIsPlaying(false);
-        if (intervalRef.current) clearInterval(intervalRef.current);
         return;
       }
 
+      // ── Resume existing sound ──
       if (soundRef.current) {
-        // Resume
+        const status = await soundRef.current.getStatusAsync();
+        if (status.isLoaded && status.didJustFinish) {
+          // Finished previously – replay from start
+          await soundRef.current.setPositionAsync(0);
+        }
         await soundRef.current.playAsync();
         setIsPlaying(true);
-        startProgressTracking();
         return;
       }
 
-      // Load and play
+      // ── First load & play ──
       if (!voiceUri) return;
       setIsLoading(true);
 
@@ -124,27 +142,68 @@ export const VoiceMessageBubble: React.FC<Props> = ({
 
       const { sound } = await Audio.Sound.createAsync(
         { uri: voiceUri },
-        { shouldPlay: true },
-        (status) => {
-          if (status.isLoaded && status.didJustFinish) {
-            setIsPlaying(false);
-            setProgress(0);
-            setCurrentTime(0);
-            if (intervalRef.current) clearInterval(intervalRef.current);
-          }
+        {
+          shouldPlay: true,
+          rate: currentSpeed,
+          shouldCorrectPitch: true,
+          progressUpdateIntervalMillis: 80,
         },
       );
 
+      sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
       soundRef.current = sound;
       setIsPlaying(true);
       setIsLoading(false);
-      startProgressTracking();
     } catch (error) {
       console.warn("Voice playback error:", error);
       setIsLoading(false);
       setIsPlaying(false);
     }
-  }, [isPlaying, voiceUri, startProgressTracking]);
+  }, [isPlaying, voiceUri, currentSpeed, onPlaybackStatusUpdate]);
+
+  /**
+   * Seek to a position by tapping on the waveform.
+   */
+  const handleSeek = useCallback(
+    async (evt: GestureResponderEvent) => {
+      if (waveformWidth <= 0) return;
+      const fraction = Math.max(
+        0,
+        Math.min(1, evt.nativeEvent.locationX / waveformWidth),
+      );
+      const dur = totalDuration > 0 ? totalDuration : duration;
+      const seekMs = fraction * dur * 1000;
+
+      setProgress(fraction);
+      setCurrentTime(fraction * dur);
+
+      if (soundRef.current) {
+        await soundRef.current.setPositionAsync(seekMs);
+        // If paused, start playing after seek
+        if (!isPlayingRef.current) {
+          await soundRef.current.playAsync();
+          setIsPlaying(true);
+        }
+      }
+    },
+    [waveformWidth, totalDuration, duration],
+  );
+
+  /**
+   * Cycle playback speed: 1x → 1.5x → 2x → 1x …
+   */
+  const handleSpeedToggle = useCallback(async () => {
+    const nextIndex = (speedIndex + 1) % SPEED_OPTIONS.length;
+    setSpeedIndex(nextIndex);
+    const newRate = SPEED_OPTIONS[nextIndex];
+    if (soundRef.current) {
+      await soundRef.current.setRateAsync(newRate, true);
+    }
+  }, [speedIndex]);
+
+  const onWaveformLayout = useCallback((e: LayoutChangeEvent) => {
+    setWaveformWidth(e.nativeEvent.layout.width);
+  }, []);
 
   const displayTime =
     isPlaying || progress > 0
@@ -156,10 +215,12 @@ export const VoiceMessageBubble: React.FC<Props> = ({
     ? "rgba(255,255,255,0.35)"
     : `${colors.primary}35`;
   const textColor = isUser ? "rgba(255,255,255,0.8)" : colors.textSecondary;
+  const speedBgColor = isUser ? "rgba(255,255,255,0.2)" : `${colors.primary}18`;
+  const speedTextColor = isUser ? "rgba(255,255,255,0.9)" : colors.primary;
 
   return (
     <View style={styles.container}>
-      {/* Play/Pause button */}
+      {/* Play / Pause */}
       <Pressable
         onPress={handlePlayPause}
         style={[
@@ -183,9 +244,13 @@ export const VoiceMessageBubble: React.FC<Props> = ({
         )}
       </Pressable>
 
-      {/* Waveform + time */}
+      {/* Waveform + time + speed row */}
       <View style={styles.waveformColumn}>
-        <View style={styles.waveformRow}>
+        <Pressable
+          onPress={handleSeek}
+          onLayout={onWaveformLayout}
+          style={styles.waveformRow}
+        >
           {waveform.map((height, i) => {
             const barProgress = i / WAVEFORM_BARS;
             const isActive = barProgress <= progress;
@@ -202,10 +267,22 @@ export const VoiceMessageBubble: React.FC<Props> = ({
               />
             );
           })}
+        </Pressable>
+        <View style={styles.bottomRow}>
+          <Text style={[styles.duration, { color: textColor }]}>
+            {displayTime}
+          </Text>
+          {/* Speed control */}
+          <Pressable
+            onPress={handleSpeedToggle}
+            style={[styles.speedButton, { backgroundColor: speedBgColor }]}
+            hitSlop={6}
+          >
+            <Text style={[styles.speedText, { color: speedTextColor }]}>
+              {currentSpeed}x
+            </Text>
+          </Pressable>
         </View>
-        <Text style={[styles.duration, { color: textColor }]}>
-          {displayTime}
-        </Text>
       </View>
     </View>
   );
@@ -216,7 +293,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    minWidth: 180,
+    minWidth: 200,
   },
   playButton: {
     width: 36,
@@ -226,7 +303,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   playButtonUser: {
-    backgroundColor: "rgba(255,255,255,0.25)",
+    backgroundColor: colors.white,
   },
   playButtonThem: {
     backgroundColor: colors.primary,
@@ -245,8 +322,22 @@ const styles = StyleSheet.create({
     width: BAR_WIDTH,
     borderRadius: BAR_WIDTH / 2,
   },
+  bottomRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   duration: {
     fontFamily: fontFamilies.primary.regular,
     fontSize: 11,
+  },
+  speedButton: {
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  speedText: {
+    fontFamily: fontFamilies.bold,
+    fontSize: 10,
   },
 });

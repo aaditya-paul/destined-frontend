@@ -1,12 +1,13 @@
 import { ActionItem, ChatActionSheet } from "@/components/chat/ChatActionSheet";
 import { ChatHeader } from "@/components/chat/ChatHeader";
-import { ChatInput } from "@/components/chat/ChatInput";
+import { ChatInput, ChatInputHandle } from "@/components/chat/ChatInput";
 import { DateSeparator } from "@/components/chat/DateSeparator";
 import { EmojiReactionPicker } from "@/components/chat/EmojiReactionPicker";
 import { MessageBubble } from "@/components/chat/MessageBubble";
 import { ScrollToBottomButton } from "@/components/chat/ScrollToBottomButton";
 import { SwipeableMessage } from "@/components/chat/SwipeableMessage";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
+import { ZoomableImage } from "@/components/chat/ZoomableImage";
 import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
 import { Message, ReplyRef } from "@/context/types";
 import { dummyChats } from "@/data/dummyData";
@@ -26,10 +27,11 @@ import {
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Platform,
-  TextInput as RNTextInput,
+  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -53,10 +55,17 @@ export default function ChatScreen() {
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [replyRef, setReplyRef] = useState<ReplyRef | null>(null);
   const [reactionPickerVisible, setReactionPickerVisible] = useState(false);
+  const [fullScreenImageUri, setFullScreenImageUri] = useState<string | null>(
+    null,
+  );
+  const [highlightedMessageId, setHighlightedMessageId] = useState<
+    string | null
+  >(null);
 
   const flatListRef = useRef<FlatList>(null);
-  const inputRef = useRef<RNTextInput>(null);
+  const inputRef = useRef<ChatInputHandle>(null);
   const pendingReactionRef = useRef(false);
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Data Processing ──────────────────────────────────────────────
   const processedData: ChatListItem[] = useMemo(
@@ -64,13 +73,58 @@ export default function ChatScreen() {
     [messages],
   );
 
+  // ── Scroll to replied message & highlight ───────────────────────
+  const handleReplyPress = useCallback(
+    (messageId: string) => {
+      const index = processedData.findIndex(
+        (item) => item.type === "message" && item.data.id === messageId,
+      );
+      if (index !== -1) {
+        flatListRef.current?.scrollToIndex({
+          index,
+          animated: true,
+          viewPosition: 0.5,
+        });
+
+        // Highlight the target message briefly
+        if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+        setHighlightedMessageId(messageId);
+        highlightTimerRef.current = setTimeout(() => {
+          setHighlightedMessageId(null);
+        }, 1500);
+      }
+    },
+    [processedData],
+  );
+
   // ── Reply Handling ───────────────────────────────────────────────
   const handleReply = useCallback(
     (msg: Message) => {
       const senderName =
         msg.sender === "user" ? "You" : (chatData?.user?.firstName ?? "Them");
-      setReplyRef({ id: msg.id, text: msg.text || "📷 Photo", senderName });
-      inputRef.current?.focus();
+
+      let replyText = msg.text;
+      if (!replyText) {
+        switch (msg.type) {
+          case "voice":
+            replyText = "🎤 Voice message";
+            break;
+          case "image":
+            replyText = "📷 Photo";
+            break;
+          default:
+            replyText = "Message";
+        }
+      }
+
+      setReplyRef({ id: msg.id, text: replyText, senderName });
+      // Ensure keyboard opens reliably even after being dismissed
+      setTimeout(() => {
+        inputRef.current?.focus();
+        // Double-tap focus as a fallback for Android where a single
+        // focus() after keyboard dismiss can be a no-op
+        setTimeout(() => inputRef.current?.focus(), 50);
+      }, 120);
     },
     [chatData],
   );
@@ -392,6 +446,15 @@ export default function ChatScreen() {
     return undefined;
   }, [chatData]);
 
+  // ── Image Viewer ───────────────────────────────────────────────
+  const handleImagePress = useCallback((uri: string) => {
+    setFullScreenImageUri(uri);
+  }, []);
+
+  const handleCloseImageViewer = useCallback(() => {
+    setFullScreenImageUri(null);
+  }, []);
+
   // ── Render Item ──────────────────────────────────────────────────
   const renderItem = useCallback(
     ({ item }: { item: ChatListItem }) => {
@@ -404,13 +467,23 @@ export default function ChatScreen() {
             message={item.data}
             position={item.position}
             showTimestamp={item.showTimestamp}
+            isHighlighted={item.data.id === highlightedMessageId}
             onLongPress={handleMessageLongPress}
             onReactionPress={handleReactionPress}
+            onReplyPress={handleReplyPress}
+            onImagePress={handleImagePress}
           />
         </SwipeableMessage>
       );
     },
-    [handleMessageLongPress, handleReply, handleReactionPress],
+    [
+      handleMessageLongPress,
+      handleReply,
+      handleReactionPress,
+      handleReplyPress,
+      handleImagePress,
+      highlightedMessageId,
+    ],
   );
 
   const keyExtractor = useCallback((item: ChatListItem) => {
@@ -512,6 +585,20 @@ export default function ChatScreen() {
               maxToRenderPerBatch={15}
               windowSize={10}
               removeClippedSubviews={Platform.OS === "android"}
+              onScrollToIndexFailed={(info) => {
+                // Scroll to approximate offset first, then retry
+                flatListRef.current?.scrollToOffset({
+                  offset: info.averageItemLength * info.index,
+                  animated: true,
+                });
+                setTimeout(() => {
+                  flatListRef.current?.scrollToIndex({
+                    index: info.index,
+                    animated: true,
+                    viewPosition: 0.5,
+                  });
+                }, 300);
+              }}
             />
 
             <ScrollToBottomButton
@@ -522,6 +609,7 @@ export default function ChatScreen() {
 
           {/* Input Bar */}
           <ChatInput
+            ref={inputRef}
             value={messageText}
             onChangeText={setMessageText}
             onSend={handleSend}
@@ -561,6 +649,26 @@ export default function ChatScreen() {
           }}
           onSelect={handleReactionSelect}
         />
+
+        {/* Full-screen Image Viewer with pinch-to-zoom */}
+        <Modal
+          visible={fullScreenImageUri !== null}
+          transparent
+          animationType="fade"
+          statusBarTranslucent
+          onRequestClose={handleCloseImageViewer}
+        >
+          <GestureHandlerRootView style={styles.imageViewerOverlay}>
+            <Pressable
+              style={styles.imageViewerClose}
+              onPress={handleCloseImageViewer}
+              hitSlop={12}
+            >
+              <Ionicons name="close" size={28} color={colors.white} />
+            </Pressable>
+            {fullScreenImageUri && <ZoomableImage uri={fullScreenImageUri} />}
+          </GestureHandlerRootView>
+        </Modal>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
@@ -645,5 +753,25 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingHorizontal: 40,
     lineHeight: 20,
+  },
+
+  // ── Full-screen Image Viewer ────────────────────────────────────
+  imageViewerOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  imageViewerClose: {
+    position: "absolute",
+    top: Platform.OS === "ios" ? 56 : 40,
+    right: 20,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

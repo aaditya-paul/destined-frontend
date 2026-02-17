@@ -207,7 +207,7 @@ export default function ChatsScreen() {
           style={styles.searchIcon}
         />
         <TextInput
-          placeholder="Search matches & messages"
+          placeholder="Search messages"
           placeholderTextColor={colors.textSecondary}
           style={styles.searchInput}
           value={searchQuery}

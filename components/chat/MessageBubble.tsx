@@ -2,16 +2,26 @@ import { colors, fontFamilies } from "@/constants/globalStyles";
 import { Message } from "@/context/types";
 import { MessagePosition, formatMessageTime } from "@/utils/chatHelpers";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef } from "react";
+import {
+  Animated,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { VoiceMessageBubble } from "./VoiceMessageBubble";
 
 interface Props {
   message: Message;
   position: MessagePosition;
   showTimestamp: boolean;
+  isHighlighted?: boolean;
   onLongPress?: (message: Message) => void;
   onReactionPress?: (message: Message, emoji: string) => void;
+  onReplyPress?: (messageId: string) => void;
+  onImagePress?: (uri: string) => void;
 }
 
 const RADIUS = 20;
@@ -21,11 +31,35 @@ export const MessageBubble: React.FC<Props> = ({
   message,
   position,
   showTimestamp,
+  isHighlighted,
   onLongPress,
   onReactionPress,
+  onReplyPress,
+  onImagePress,
 }) => {
   const isUser = message.sender === "user";
   const isDeleted = message.isDeleted === true;
+  const highlightAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isHighlighted) {
+      // Flash in then fade out
+      Animated.sequence([
+        Animated.timing(highlightAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(highlightAnim, {
+          toValue: 0,
+          duration: 1200,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    } else {
+      highlightAnim.setValue(0);
+    }
+  }, [isHighlighted, highlightAnim]);
 
   // Grouped border-radius: the shared edge between consecutive bubbles
   // from the same sender gets a small radius for visual continuity.
@@ -97,7 +131,16 @@ export const MessageBubble: React.FC<Props> = ({
             ]}
           >
             <Text style={styles.reactionEmoji}>{r.emoji}</Text>
-            {r.count > 1 && <Text style={styles.reactionCount}>{r.count}</Text>}
+            {r.count > 1 && (
+              <Text
+                style={[
+                  styles.reactionCount,
+                  r.byUser && styles.reactionCountActive,
+                ]}
+              >
+                {r.count}
+              </Text>
+            )}
           </Pressable>
         ))}
       </View>
@@ -134,7 +177,15 @@ export const MessageBubble: React.FC<Props> = ({
   }
 
   return (
-    <View>
+    <Animated.View
+      style={{
+        backgroundColor: highlightAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: ["transparent", `${colors.primary}20`],
+        }),
+        borderRadius: RADIUS,
+      }}
+    >
       <Pressable
         onLongPress={() => onLongPress?.(message)}
         delayLongPress={350}
@@ -154,7 +205,8 @@ export const MessageBubble: React.FC<Props> = ({
         >
           {/* Reply reference */}
           {message.replyTo && (
-            <View
+            <Pressable
+              onPress={() => onReplyPress?.(message.replyTo!.id)}
               style={[
                 styles.replyBar,
                 isUser ? styles.replyBarUser : styles.replyBarThem,
@@ -178,16 +230,18 @@ export const MessageBubble: React.FC<Props> = ({
               >
                 {message.replyTo.text}
               </Text>
-            </View>
+            </Pressable>
           )}
 
           {/* Image message */}
           {message.type === "image" && message.imageUri && (
-            <Image
-              source={{ uri: message.imageUri }}
-              style={styles.image}
-              resizeMode="cover"
-            />
+            <Pressable onPress={() => onImagePress?.(message.imageUri!)}>
+              <Image
+                source={{ uri: message.imageUri }}
+                style={styles.image}
+                resizeMode="cover"
+              />
+            </Pressable>
           )}
 
           {/* Voice message */}
@@ -227,7 +281,7 @@ export const MessageBubble: React.FC<Props> = ({
 
       {/* Reactions below the bubble */}
       {renderReactions()}
-    </View>
+    </Animated.View>
   );
 };
 
@@ -336,19 +390,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 16,
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
+    minHeight: 28,
     borderWidth: 1.5,
-    borderColor: colors.white,
-    // Add 3D-ish shadow
+    borderColor: colors.border,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
     elevation: 3,
   },
   reactionBadgeActive: {
-    borderColor: colors.white,
-    backgroundColor: `${colors.primary}`,
+    borderColor: colors.primary,
+    backgroundColor: `${colors.primary}1`,
   },
   reactionEmoji: {
     fontSize: 16,
@@ -357,8 +411,11 @@ const styles = StyleSheet.create({
   reactionCount: {
     fontSize: 12,
     fontFamily: fontFamilies.bold,
-    color: colors.primary,
+    color: colors.textSecondary,
     marginLeft: 3,
+  },
+  reactionCountActive: {
+    color: colors.primary,
   },
 
   image: {

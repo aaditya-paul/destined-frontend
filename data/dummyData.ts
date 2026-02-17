@@ -330,6 +330,25 @@ export const dummyChats: Chat[] = [
           senderName: "Jessica",
         },
       },
+      // Image message – game screenshot
+      {
+        id: "j8img",
+        text: "",
+        sender: "them",
+        timestamp: new Date(NOW - 2 * HOUR),
+        type: "image",
+        imageUri:
+          "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop",
+      },
+      {
+        id: "j8img2",
+        text: "Look at this setup! 🎮",
+        sender: "them",
+        timestamp: new Date(NOW - 2 * HOUR + MINUTE),
+        type: "image",
+        imageUri:
+          "https://images.unsplash.com/photo-1593305841991-05c297ba4575?q=80&w=1957&auto=format&fit=crop",
+      },
       {
         id: "j9",
         text: "Omg yes! FF7 Remake was incredible 🎮",
@@ -485,6 +504,17 @@ export const dummyChats: Chat[] = [
         sender: "user",
         timestamp: new Date(NOW - 3 * DAY - 6.5 * HOUR),
         status: "read",
+      },
+      // Image message – hiking photo
+      {
+        id: "s4img",
+        text: "",
+        sender: "user",
+        timestamp: new Date(NOW - 3 * DAY - 6.2 * HOUR),
+        status: "read",
+        type: "image",
+        imageUri:
+          "https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=2070&auto=format&fit=crop",
       },
       // Voice message – user describing the trail
       {
@@ -663,6 +693,16 @@ export const dummyChats: Chat[] = [
           text: "🎤 Voice message",
           senderName: "You",
         },
+      },
+      // Image message – taco spot photo
+      {
+        id: "e7img",
+        text: "",
+        sender: "them",
+        timestamp: new Date(NOW - 28 * MINUTE),
+        type: "image",
+        imageUri:
+          "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?q=80&w=1980&auto=format&fit=crop",
       },
     ],
   },
