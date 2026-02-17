@@ -1,12 +1,6 @@
 import { colors } from "@/constants/globalStyles";
 import React from "react";
-import {
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 const REACTIONS = ["❤️", "😂", "😮", "😢", "🙏", "👍"];
 

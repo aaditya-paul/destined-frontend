@@ -429,7 +429,7 @@ export default function ChatScreen() {
       <SafeAreaView style={styles.container}>
         <KeyboardAvoidingView
           style={styles.keyboardView}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior="padding"
           keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
         >
           {/* Header */}
@@ -526,6 +526,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: "100%",
     backgroundColor: colors.background,
   },
   keyboardView: {

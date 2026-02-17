@@ -19,6 +19,7 @@
         "monochromeImage": "./assets/images/android_logo.png"
       },
       "edgeToEdgeEnabled": true,
+      "softwareKeyboardLayoutMode": "resize",
       "predictiveBackGestureEnabled": false,
       "package": "com.aaditya_paul.destined"
     },

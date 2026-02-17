@@ -82,8 +82,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.lg,
     backgroundColor: colors.background,
+    marginTop: 15,
   },
   backBtn: {
     padding: spacing.sm,

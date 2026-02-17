@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/EditorialComponents";
 import { colors, fontFamilies, spacing } from "@/constants/globalStyles";
 import { dummyChats, dummyNewMatches } from "@/data/dummyData";
-import { formatChatListTime, formatLastActive } from "@/utils/chatHelpers";
+import { formatChatListTime } from "@/utils/chatHelpers";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
@@ -86,9 +86,7 @@ const ChatRow = ({
           <Text style={styles.chatName} numberOfLines={1}>
             {chat.user.firstName}
           </Text>
-          <Text
-            style={[styles.chatTime, chat.unread && styles.chatTimeUnread]}
-          >
+          <Text style={[styles.chatTime, chat.unread && styles.chatTimeUnread]}>
             {timeStr}
           </Text>
         </View>
@@ -178,9 +176,7 @@ export default function ChatsScreen() {
   const filteredMatches = useMemo(() => {
     if (!searchQuery.trim()) return dummyNewMatches;
     const q = searchQuery.toLowerCase();
-    return dummyNewMatches.filter((p) =>
-      p.firstName.toLowerCase().includes(q),
-    );
+    return dummyNewMatches.filter((p) => p.firstName.toLowerCase().includes(q));
   }, [searchQuery]);
 
   const onRefresh = useCallback(() => {
@@ -221,7 +217,11 @@ export default function ChatsScreen() {
         />
         {isSearchActive && Platform.OS === "android" && (
           <Pressable onPress={() => setSearchQuery("")} hitSlop={8}>
-            <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
+            <Ionicons
+              name="close-circle"
+              size={18}
+              color={colors.textSecondary}
+            />
           </Pressable>
         )}
       </View>
