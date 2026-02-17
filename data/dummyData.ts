@@ -252,6 +252,7 @@ export const dummyChats: Chat[] = [
         sender: "them",
         timestamp: new Date(NOW - 1 * DAY - 5 * HOUR),
         status: "read",
+        reactions: [{ emoji: "❤️", sender: "user" }],
       },
       {
         id: "j2",
@@ -273,6 +274,11 @@ export const dummyChats: Chat[] = [
         sender: "them",
         timestamp: new Date(NOW - 1 * DAY - 4 * HOUR),
         status: "read",
+        replyTo: {
+          id: "j3",
+          text: "Which one's your favorite?",
+          senderName: "You",
+        },
       },
       {
         id: "j5",
@@ -280,6 +286,10 @@ export const dummyChats: Chat[] = [
         sender: "them",
         timestamp: new Date(NOW - 1 * DAY - 4 * HOUR + MINUTE),
         status: "read",
+        reactions: [
+          { emoji: "😭", sender: "user" },
+          { emoji: "💯", sender: "them" },
+        ],
       },
       {
         id: "j6",
@@ -287,6 +297,18 @@ export const dummyChats: Chat[] = [
         sender: "user",
         timestamp: new Date(NOW - 1 * DAY - 3.5 * HOUR),
         status: "read",
+      },
+      // Voice message from them
+      {
+        id: "j6v",
+        text: "",
+        sender: "them",
+        timestamp: new Date(NOW - 1 * DAY - 3 * HOUR),
+        status: "read",
+        type: "voice",
+        voiceUri:
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        voiceDuration: 12,
       },
       // Today
       {
@@ -302,12 +324,18 @@ export const dummyChats: Chat[] = [
         sender: "user",
         timestamp: new Date(NOW - 2.5 * HOUR),
         status: "read",
+        replyTo: {
+          id: "j7",
+          text: "Have you played the FF7 Rebirth yet??",
+          senderName: "Jessica",
+        },
       },
       {
         id: "j9",
         text: "Omg yes! FF7 Remake was incredible 🎮",
         sender: "them",
         timestamp: new Date(NOW - 8 * MINUTE),
+        reactions: [{ emoji: "🔥", sender: "user" }],
       },
       {
         id: "j10",
@@ -322,7 +350,7 @@ export const dummyChats: Chat[] = [
   {
     id: "2",
     user: dummyProfiles[3],
-    lastMessage: "I'll send you the playlist! 🎵",
+    lastMessage: "Can't wait!",
     unread: false,
     unreadCount: 0,
     isOnline: true,
@@ -334,6 +362,10 @@ export const dummyChats: Chat[] = [
         sender: "them",
         timestamp: new Date(NOW - 2 * DAY - 3 * HOUR),
         status: "read",
+        reactions: [
+          { emoji: "😂", sender: "user" },
+          { emoji: "😂", sender: "them" },
+        ],
       },
       {
         id: "ma2",
@@ -355,14 +387,31 @@ export const dummyChats: Chat[] = [
         sender: "user",
         timestamp: new Date(NOW - 2 * DAY - 1.5 * HOUR),
         status: "read",
+        reactions: [{ emoji: "🎵", sender: "them" }],
       },
-      // Yesterday
+      // Yesterday – voice message
+      {
+        id: "ma4v",
+        text: "",
+        sender: "them",
+        timestamp: new Date(NOW - 1 * DAY - 7 * HOUR),
+        status: "read",
+        type: "voice",
+        voiceUri:
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+        voiceDuration: 18,
+      },
       {
         id: "ma5",
         text: "Ok I made a playlist of all the best K-pop tracks",
         sender: "them",
         timestamp: new Date(NOW - 1 * DAY - 6 * HOUR),
         status: "read",
+        replyTo: {
+          id: "ma4",
+          text: "NewJeans are so good! Super Shy is on repeat",
+          senderName: "You",
+        },
       },
       {
         id: "ma6",
@@ -377,6 +426,7 @@ export const dummyChats: Chat[] = [
         sender: "user",
         timestamp: new Date(NOW - 1 * DAY - 5 * HOUR),
         status: "read",
+        reactions: [{ emoji: "❤️", sender: "them" }],
       },
       // Today
       {
@@ -427,6 +477,7 @@ export const dummyChats: Chat[] = [
         sender: "them",
         timestamp: new Date(NOW - 3 * DAY - 7 * HOUR),
         status: "read",
+        reactions: [{ emoji: "🏔️", sender: "user" }],
       },
       {
         id: "s4",
@@ -435,6 +486,18 @@ export const dummyChats: Chat[] = [
         timestamp: new Date(NOW - 3 * DAY - 6.5 * HOUR),
         status: "read",
       },
+      // Voice message – user describing the trail
+      {
+        id: "s4v",
+        text: "",
+        sender: "user",
+        timestamp: new Date(NOW - 3 * DAY - 6 * HOUR),
+        status: "read",
+        type: "voice",
+        voiceUri:
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        voiceDuration: 23,
+      },
       // 2 days ago
       {
         id: "s5",
@@ -442,6 +505,11 @@ export const dummyChats: Chat[] = [
         sender: "them",
         timestamp: new Date(NOW - 2 * DAY - 4 * HOUR),
         status: "read",
+        replyTo: {
+          id: "s4v",
+          text: "🎤 Voice message",
+          senderName: "You",
+        },
       },
       {
         id: "s6",
@@ -463,6 +531,10 @@ export const dummyChats: Chat[] = [
         sender: "them",
         timestamp: new Date(NOW - 2 * DAY - 3 * HOUR),
         status: "read",
+        reactions: [
+          { emoji: "🥾", sender: "user" },
+          { emoji: "❤️", sender: "them" },
+        ],
       },
       // Yesterday
       {
@@ -471,6 +543,11 @@ export const dummyChats: Chat[] = [
         sender: "user",
         timestamp: new Date(NOW - 1 * DAY - 6 * HOUR),
         status: "read",
+        replyTo: {
+          id: "s8",
+          text: "We should totally plan a hike together!",
+          senderName: "Sarah",
+        },
       },
       {
         id: "s10",
@@ -485,6 +562,7 @@ export const dummyChats: Chat[] = [
         sender: "user",
         timestamp: new Date(NOW - 1 * DAY - 4.5 * HOUR),
         status: "read",
+        reactions: [{ emoji: "🎉", sender: "them" }],
       },
     ],
   },
@@ -513,6 +591,7 @@ export const dummyChats: Chat[] = [
         sender: "user",
         timestamp: new Date(NOW - 5.5 * HOUR),
         status: "read",
+        reactions: [{ emoji: "😂", sender: "them" }],
       },
       {
         id: "e3",
@@ -527,6 +606,11 @@ export const dummyChats: Chat[] = [
         sender: "user",
         timestamp: new Date(NOW - 4.5 * HOUR),
         status: "read",
+        replyTo: {
+          id: "e3",
+          text: "Same! So what's your go-to spontaneous adventure?",
+          senderName: "Emily",
+        },
       },
       {
         id: "e5",
@@ -534,6 +618,22 @@ export const dummyChats: Chat[] = [
         sender: "them",
         timestamp: new Date(NOW - 4 * HOUR),
         status: "read",
+        reactions: [
+          { emoji: "🤝", sender: "user" },
+          { emoji: "🤝", sender: "them" },
+        ],
+      },
+      // Voice message from user
+      {
+        id: "e5v",
+        text: "",
+        sender: "user",
+        timestamp: new Date(NOW - 3.8 * HOUR),
+        status: "read",
+        type: "voice",
+        voiceUri:
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+        voiceDuration: 8,
       },
       {
         id: "e6",
@@ -542,11 +642,27 @@ export const dummyChats: Chat[] = [
         timestamp: new Date(NOW - 3.5 * HOUR),
         status: "delivered",
       },
+      // Voice message from them
+      {
+        id: "e6v",
+        text: "",
+        sender: "them",
+        timestamp: new Date(NOW - 1 * HOUR),
+        type: "voice",
+        voiceUri:
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+        voiceDuration: 15,
+      },
       {
         id: "e7",
         text: "Surpriseee 🎉 I found the best taco spot",
         sender: "them",
         timestamp: new Date(NOW - 30 * MINUTE),
+        replyTo: {
+          id: "e5v",
+          text: "🎤 Voice message",
+          senderName: "You",
+        },
       },
     ],
   },
@@ -555,7 +671,7 @@ export const dummyChats: Chat[] = [
   {
     id: "5",
     user: dummyProfiles[4],
-    lastMessage: "Your playlist must be fire 🔥",
+    lastMessage: "Anything high energy! EDM, hip hop, pop",
     unread: false,
     unreadCount: 0,
     isOnline: false,
@@ -576,12 +692,30 @@ export const dummyChats: Chat[] = [
         timestamp: new Date(NOW - 3 * DAY - 1.5 * HOUR),
         status: "read",
       },
+      // Voice message – sharing a song snippet
+      {
+        id: "o2v",
+        text: "",
+        sender: "user",
+        timestamp: new Date(NOW - 3 * DAY - 1.3 * HOUR),
+        status: "read",
+        type: "voice",
+        voiceUri:
+          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+        voiceDuration: 10,
+        reactions: [{ emoji: "🔥", sender: "them" }],
+      },
       {
         id: "o3",
         text: "Love that! I need good workout playlists",
         sender: "them",
         timestamp: new Date(NOW - 3 * DAY - 1 * HOUR),
         status: "read",
+        replyTo: {
+          id: "o2v",
+          text: "🎤 Voice message",
+          senderName: "You",
+        },
       },
       {
         id: "o4",
@@ -596,6 +730,7 @@ export const dummyChats: Chat[] = [
         sender: "them",
         timestamp: new Date(NOW - 3 * DAY - 30 * MINUTE),
         status: "read",
+        reactions: [{ emoji: "🎶", sender: "user" }],
       },
     ],
   },

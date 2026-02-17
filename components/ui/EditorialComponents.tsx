@@ -108,5 +108,6 @@ export const styles = StyleSheet.create({
     letterSpacing: 2.5,
     marginBottom: spacing.lg,
     opacity: 0.6,
+    paddingHorizontal: spacing.xl,
   },
 });

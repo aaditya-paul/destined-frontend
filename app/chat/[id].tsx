@@ -230,6 +230,48 @@ export default function ChatScreen() {
     }
   }, []);
 
+  // ── Voice Message ────────────────────────────────────────────────
+  const handleVoiceSend = useCallback(
+    (uri: string, duration: number) => {
+      const newMsg: Message = {
+        id: `voice-${Date.now()}`,
+        text: "",
+        sender: "user",
+        timestamp: new Date(),
+        status: "sent",
+        type: "voice",
+        voiceUri: uri,
+        voiceDuration: duration,
+        ...(replyRef ? { replyTo: replyRef } : {}),
+      };
+
+      setMessages((prev) => [...prev, newMsg]);
+      setReplyRef(null);
+
+      // Simulate delivery
+      setTimeout(() => {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === newMsg.id ? { ...m, status: "delivered" } : m,
+          ),
+        );
+      }, 1500);
+
+      // Simulate read
+      setTimeout(() => {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === newMsg.id ? { ...m, status: "read" } : m)),
+        );
+      }, 4000);
+
+      // Auto-scroll
+      setTimeout(() => {
+        flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+      }, 100);
+    },
+    [replyRef],
+  );
+
   // ── Scroll Handling ──────────────────────────────────────────────
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -485,6 +527,7 @@ export default function ChatScreen() {
             onSend={handleSend}
             onCameraPress={handleCameraPress}
             onImagePress={handleImagePick}
+            onVoiceSend={handleVoiceSend}
             replyRef={replyRef}
             onCancelReply={handleCancelReply}
           />

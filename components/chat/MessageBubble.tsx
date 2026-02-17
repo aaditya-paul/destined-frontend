@@ -4,6 +4,7 @@ import { MessagePosition, formatMessageTime } from "@/utils/chatHelpers";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { VoiceMessageBubble } from "./VoiceMessageBubble";
 
 interface Props {
   message: Message;
@@ -186,6 +187,15 @@ export const MessageBubble: React.FC<Props> = ({
               source={{ uri: message.imageUri }}
               style={styles.image}
               resizeMode="cover"
+            />
+          )}
+
+          {/* Voice message */}
+          {message.type === "voice" && (
+            <VoiceMessageBubble
+              voiceUri={message.voiceUri}
+              duration={message.voiceDuration}
+              isUser={isUser}
             />
           )}
 

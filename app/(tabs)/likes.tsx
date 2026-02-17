@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: spacing.xl,
+    paddingTop: spacing["2xl"],
   },
   header: {
     paddingHorizontal: spacing.xl,

@@ -302,12 +302,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: spacing.xl,
+    paddingTop: spacing["2xl"],
+    // this is for making the entire screen scrollable otherwise its hidden behind the bottom tab bar
+    paddingBottom: 120,
   },
   scrollContent: {
-    paddingHorizontal: spacing["2xl"],
-    paddingTop: spacing.xl,
-    paddingBottom: 120,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xl,
   },
   header: {
     marginBottom: spacing.xl,

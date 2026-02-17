@@ -59,6 +59,8 @@ export interface Message {
   status?: "sent" | "delivered" | "read";
   type?: "text" | "image" | "voice";
   imageUri?: string;
+  voiceUri?: string;
+  voiceDuration?: number; // seconds
   replyTo?: ReplyRef;
   reactions?: MessageReaction[];
   isDeleted?: boolean;

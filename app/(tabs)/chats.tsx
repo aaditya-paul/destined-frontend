@@ -106,7 +106,7 @@ const ChatRow = ({
             numberOfLines={1}
           >
             {lastMsg?.sender === "user" ? "You: " : ""}
-            {chat.lastMessage}
+            {lastMsg?.type === "voice" ? "🎤 Voice message" : chat.lastMessage}
           </Text>
         )}
       </View>
@@ -243,7 +243,7 @@ export default function ChatsScreen() {
         ) : (
           <>
             {/* New Matches Section */}
-            {filteredMatches.length > 0 && (
+            {/* {filteredMatches.length > 0 && (
               <View style={styles.section}>
                 <SectionLabel text="NEW MATCHES" />
                 <ScrollView
@@ -273,7 +273,7 @@ export default function ChatsScreen() {
                   })}
                 </ScrollView>
               </View>
-            )}
+            )} */}
 
             {/* Messages Section */}
             <View style={styles.section}>
@@ -307,9 +307,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    paddingHorizontal: spacing.xl,
-    paddingTop: 60,
+    paddingTop: spacing["2xl"],
     marginBottom: spacing.md,
+    paddingHorizontal: spacing.xl,
   },
 
   // ── Search ──────────────────────────────────────────────────────
